@@ -1,4 +1,5 @@
 *.bkp
 *.png
 *.csv
+*.backup
 printer-*.cfg
