@@ -1,0 +1,6 @@
+PrusaSlicer/cache/**
+PrusaSlicer/snapshots/**
+PrusaSlicer/vendor/**
+PrusaSlicer.ini
+ArchiveRepositoryManifest.json
+*.bak
