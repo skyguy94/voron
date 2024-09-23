@@ -4,3 +4,9 @@ PrusaSlicer/vendor/**
 PrusaSlicer.ini
 ArchiveRepositoryManifest.json
 *.bak
+OrcaSlicer/hms/**
+OrcaSlicer/log/**
+OrcaSlicer/ota/**
+OrcaSlicer/printers/**
+OrcaSlicer.conf
+OrcaSlicer.conf.bak
