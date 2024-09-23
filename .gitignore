@@ -9,5 +9,6 @@ OrcaSlicer/log/**
 OrcaSlicer/ota/**
 OrcaSlicer/printers/**
 OrcaSlicer/system/**
+OrcaSlicer/user/hints.cereal
 OrcaSlicer.conf
 OrcaSlicer.conf.bak
