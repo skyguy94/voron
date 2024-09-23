@@ -8,5 +8,6 @@ OrcaSlicer/hms/**
 OrcaSlicer/log/**
 OrcaSlicer/ota/**
 OrcaSlicer/printers/**
+OrcaSlicer/system/**
 OrcaSlicer.conf
 OrcaSlicer.conf.bak
