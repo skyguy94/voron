@@ -21,7 +21,6 @@
     "inner_wall_speed": "150",
     "internal_solid_infill_acceleration": "5000",
     "is_custom_defined": "0",
-    "line_width": "0.46",
     "name": "Normal (15mm3)",
     "outer_wall_acceleration": "1000",
     "outer_wall_speed": "80",
