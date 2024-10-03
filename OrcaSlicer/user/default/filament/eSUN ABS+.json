@@ -20,9 +20,6 @@
     "filament_cooling_moves": [
         "0"
     ],
-    "filament_flow_ratio": [
-        "0.95"
-    ],
     "filament_loading_speed": [
         "0"
     ],
@@ -32,17 +29,11 @@
     "filament_max_volumetric_speed": [
         "15"
     ],
-    "filament_multitool_ramming_flow": [
-        "0"
-    ],
-    "filament_multitool_ramming_volume": [
-        "0"
-    ],
     "filament_ramming_parameters": [
         "120 100 6.62366 6.75269 6.88172 7.01075 7.31183 7.78495 8.34409 8.88172 9.26882 9.52688 9.74194 9.89247| 0.05 6.6 0.45 6.8 0.95 7.06882 1.45 7.99892 1.95 9.09785 2.45 9.6129 2.95 9.96559 3.45 7.6 3.95 7.6 4.45 7.6 4.95 7.6"
     ],
     "filament_settings_id": [
-        "Fiberlogy ABS"
+        "eSUN ABS+"
     ],
     "filament_unloading_speed": [
         "0"
@@ -62,7 +53,7 @@
     ],
     "inherits": "Voron Generic ABS",
     "is_custom_defined": "0",
-    "name": "Fiberlogy ABS",
+    "name": "eSUN ABS+",
     "nozzle_temperature": [
         "250"
     ],
