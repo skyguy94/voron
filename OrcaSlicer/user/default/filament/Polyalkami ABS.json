@@ -12,13 +12,13 @@
         "50"
     ],
     "filament_cooling_final_speed": [
-        "0"
+        "8"
     ],
     "filament_cooling_initial_speed": [
-        "0"
+        "3"
     ],
     "filament_cooling_moves": [
-        "0"
+        "1"
     ],
     "filament_cost": [
         "21"
@@ -27,28 +27,40 @@
         "1.05"
     ],
     "filament_flow_ratio": [
-        "0.94"
+        "0.942"
     ],
     "filament_loading_speed": [
-        "0"
+        "80"
     ],
     "filament_loading_speed_start": [
-        "0"
+        "80"
     ],
     "filament_max_volumetric_speed": [
-        "15"
+        "24"
+    ],
+    "filament_minimal_purge_on_wipe_tower": [
+        "1"
+    ],
+    "filament_multitool_ramming_flow": [
+        "0"
+    ],
+    "filament_multitool_ramming_volume": [
+        "0"
     ],
     "filament_ramming_parameters": [
-        "120 100 6.62366 6.75269 6.90323 7.05376 7.33333 7.76344 8.21505 8.62366 8.98925 9.35484 9.78495 10.1075| 0.05 6.6 0.45 6.8 0.95 7.11183 1.45 7.95591 1.95 8.79677 2.45 9.52688 2.95 10.2237 3.45 7.6 3.95 7.6 4.45 7.6 4.95 7.6"
+        "120 100| 0.05 6.6 0.45 6.8 0.95 7.8 1.45 8.3 1.95 9.7 2.45 10 2.95 7.6 3.45 7.6 3.95 7.6 4.45 7.6 4.95 7.6"
     ],
     "filament_settings_id": [
         "Polyalkami ABS"
     ],
-    "filament_unloading_speed": [
-        "0"
+    "filament_stamping_distance": [
+        "10"
     ],
-    "filament_unloading_speed_start": [
-        "0"
+    "filament_stamping_loading_speed": [
+        "20"
+    ],
+    "filament_unloading_speed": [
+        "20"
     ],
     "filament_vendor": [
         "Polyalkami"
@@ -74,6 +86,12 @@
     ],
     "slow_down_for_layer_cooling": [
         "0"
+    ],
+    "textured_plate_temp": [
+        "110"
+    ],
+    "textured_plate_temp_initial_layer": [
+        "110"
     ],
     "version": "2.2.0.0"
 }

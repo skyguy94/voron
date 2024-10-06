@@ -12,25 +12,28 @@
         "50"
     ],
     "filament_cooling_final_speed": [
-        "0"
+        "8"
     ],
     "filament_cooling_initial_speed": [
-        "0"
+        "3"
     ],
     "filament_cooling_moves": [
-        "0"
+        "1"
     ],
     "filament_flow_ratio": [
         "0.95"
     ],
     "filament_loading_speed": [
-        "0"
+        "80"
     ],
     "filament_loading_speed_start": [
-        "0"
+        "80"
     ],
     "filament_max_volumetric_speed": [
-        "15"
+        "24"
+    ],
+    "filament_minimal_purge_on_wipe_tower": [
+        "0"
     ],
     "filament_multitool_ramming_flow": [
         "0"
@@ -39,16 +42,19 @@
         "0"
     ],
     "filament_ramming_parameters": [
-        "120 100 6.62366 6.75269 6.88172 7.01075 7.31183 7.78495 8.34409 8.88172 9.26882 9.52688 9.74194 9.89247| 0.05 6.6 0.45 6.8 0.95 7.06882 1.45 7.99892 1.95 9.09785 2.45 9.6129 2.95 9.96559 3.45 7.6 3.95 7.6 4.45 7.6 4.95 7.6"
+        "120 100 6.62366 6.75269 6.88172 7.03226 7.33333 7.80645 8.36559 8.90323 9.33333 9.54839| 0.05 6.6 0.45 6.8 0.95 7.06882 1.45 7.99892 1.95 9.09785 2.45 9.6129 2.95 9.96559 3.45 7.6 3.95 7.6 4.45 7.6 4.95 7.6"
     ],
     "filament_settings_id": [
         "Fiberlogy ABS"
     ],
-    "filament_unloading_speed": [
-        "0"
+    "filament_stamping_distance": [
+        "10"
     ],
-    "filament_unloading_speed_start": [
-        "0"
+    "filament_stamping_loading_speed": [
+        "30"
+    ],
+    "filament_unloading_speed": [
+        "20"
     ],
     "from": "User",
     "hot_plate_temp": [
@@ -58,7 +64,7 @@
         "110"
     ],
     "idle_temperature": [
-        "150"
+        "149"
     ],
     "inherits": "Voron Generic ABS",
     "is_custom_defined": "0",
@@ -68,6 +74,12 @@
     ],
     "nozzle_temperature_initial_layer": [
         "250"
+    ],
+    "textured_plate_temp": [
+        "110"
+    ],
+    "textured_plate_temp_initial_layer": [
+        "110"
     ],
     "version": "2.2.0.0"
 }

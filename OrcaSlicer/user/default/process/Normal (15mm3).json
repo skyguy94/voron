@@ -8,6 +8,7 @@
     "enable_overhang_speed": "0",
     "enable_prime_tower": "1",
     "enable_support": "1",
+    "filter_out_gap_fill": "0.2",
     "flush_into_infill": "1",
     "from": "User",
     "gap_fill_target": "topbottom",
@@ -20,6 +21,7 @@
     "name": "Normal (15mm3)",
     "only_one_wall_top": "1",
     "outer_wall_speed": "80",
+    "precise_outer_wall": "1",
     "print_settings_id": "Normal (15mm3)",
     "small_perimeter_speed": "30",
     "sparse_infill_density": "40%",
@@ -32,5 +34,6 @@
     "travel_acceleration": "10000",
     "travel_speed": "450",
     "version": "2.1.1.0",
-    "wall_loops": "4"
+    "wall_loops": "4",
+    "wall_sequence": "inner-outer-inner wall"
 }
