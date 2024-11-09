@@ -7,15 +7,14 @@
     "inherits": "Voron Trident 300 0.4 nozzle",
     "is_custom_defined": "0",
     "layer_change_gcode": ";AFTER_LAYER_CHANGE\n_MMU_UPDATE_HEIGHT",
-    "machine_end_gcode": "MMU_END\nPRINT_END",
     "machine_load_filament_time": "30",
-    "machine_start_gcode": "MMU_START_SETUP INITIAL_TOOL={initial_tool} REFERENCED_TOOLS=!referenced_tools! TOOL_COLORS=!colors! TOOL_TEMPS=!temperatures! TOOL_MATERIALS=!materials! PURGE_VOLUMES=!purge_volumes!\n\nPRINT_WARMUP BED=[first_layer_bed_temperature[initial_tool]] CHAMBER=[chamber_temperature[initial_tool]] EXTRUDER_IDLE=[idle_temperature[initial_tool]]\n\nPRINT_START BED=[first_layer_bed_temperature[initial_tool]] EXTRUDER=[first_layer_temperature[initial_tool]] EXTRUDER_IDLE=[idle_temperature[initial_tool]] \n\nMMU_START_CHECK\n\nMMU_START_LOAD_INITIAL_TOOL\nLINE_PURGE",
+    "machine_start_gcode": "MMU ENABLE=0\n\nPRINT_WARMUP BED=[first_layer_bed_temperature[initial_tool]] CHAMBER=[chamber_temperature[initial_tool]] EXTRUDER_IDLE=[idle_temperature[initial_tool]]\n\nPRINT_START BED=[first_layer_bed_temperature[initial_tool]] EXTRUDER=[first_layer_temperature[initial_tool]] EXTRUDER_IDLE=[idle_temperature[initial_tool]] \n\nLINE_PURGE",
     "machine_unload_filament_time": "22",
-    "name": "VT.1399 ERCF",
+    "name": "VT.1399 ERCF (MMU Disabled)",
     "nozzle_type": "brass",
     "parking_pos_retraction": "40",
     "print_host": "https://trident.local",
-    "printer_settings_id": "VT.1399 ERCF",
+    "printer_settings_id": "VT.1399 ERCF (MMU Disabled)",
     "printhost_ssl_ignore_revoke": "1",
     "retract_length_toolchange": [
         "0"

@@ -5,9 +5,7 @@
     "brim_type": "no_brim",
     "default_acceleration": "7000",
     "elefant_foot_compensation": "0.2",
-    "enable_overhang_speed": "0",
     "enable_prime_tower": "1",
-    "enable_support": "1",
     "filter_out_gap_fill": "0.2",
     "flush_into_infill": "1",
     "from": "User",
@@ -34,6 +32,5 @@
     "travel_acceleration": "10000",
     "travel_speed": "450",
     "version": "2.1.1.0",
-    "wall_loops": "4",
-    "wall_sequence": "inner-outer-inner wall"
+    "wall_loops": "4"
 }
