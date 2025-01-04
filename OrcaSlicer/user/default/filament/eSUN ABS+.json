@@ -41,6 +41,9 @@
     "filament_unloading_speed_start": [
         "0"
     ],
+    "filament_vendor": [
+        "eSUN"
+    ],
     "from": "User",
     "hot_plate_temp": [
         "110"

@@ -5,6 +5,18 @@
     "close_fan_the_first_x_layers": [
         "4"
     ],
+    "cool_plate_temp": [
+        "95"
+    ],
+    "cool_plate_temp_initial_layer": [
+        "95"
+    ],
+    "eng_plate_temp": [
+        "95"
+    ],
+    "eng_plate_temp_initial_layer": [
+        "95"
+    ],
     "fan_max_speed": [
         "40"
     ],
@@ -19,6 +31,9 @@
     ],
     "filament_cooling_moves": [
         "3"
+    ],
+    "filament_density": [
+        "1.12"
     ],
     "filament_flow_ratio": [
         "0.95"
@@ -45,7 +60,7 @@
         "120 100 6.83871 6.83871 6.90323 6.88172 6.60215 6.7957 8.3871 10.6452 11.5914 9.91398 5.74194 1.76344| 0.05 6.83871 0.45 6.7957 0.95 6.83871 1.45 6.96774 1.95 11.6129 2.45 8.70968 2.95 0.417167 3.45 0.0731224 3.95 0 4.45 0 4.95 0"
     ],
     "filament_settings_id": [
-        "Fiberlogy ABS"
+        "Polymaker ABS"
     ],
     "filament_stamping_distance": [
         "40"
@@ -60,26 +75,44 @@
         "120"
     ],
     "filament_vendor": [
-        "Fiberlogy"
+        "Polymaker"
     ],
     "from": "User",
     "hot_plate_temp": [
-        "110"
+        "95"
     ],
     "hot_plate_temp_initial_layer": [
-        "110"
+        "95"
     ],
     "idle_temperature": [
         "149"
     ],
     "inherits": "Voron Generic ABS",
     "is_custom_defined": "0",
-    "name": "Fiberlogy ABS",
+    "name": "Polymaker ABS",
+    "nozzle_temperature": [
+        "255"
+    ],
+    "nozzle_temperature_initial_layer": [
+        "255"
+    ],
+    "nozzle_temperature_range_high": [
+        "265"
+    ],
+    "nozzle_temperature_range_low": [
+        "245"
+    ],
+    "textured_cool_plate_temp": [
+        "95"
+    ],
+    "textured_cool_plate_temp_initial_layer": [
+        "95"
+    ],
     "textured_plate_temp": [
-        "110"
+        "95"
     ],
     "textured_plate_temp_initial_layer": [
-        "110"
+        "95"
     ],
     "version": "2.2.0.0"
 }

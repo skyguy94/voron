@@ -20,8 +20,10 @@
     "retract_length_toolchange": [
         "0"
     ],
+    "retraction_speed": [
+        "60"
+    ],
     "support_multi_bed_types": "1",
-    "use_firmware_retraction": "1",
     "version": "2.1.1.0",
     "wipe": [
         "0"
