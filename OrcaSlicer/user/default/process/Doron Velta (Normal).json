@@ -1,0 +1,8 @@
+{
+    "from": "User",
+    "inherits": "process template @Doron Velta 0.4 nozzle",
+    "is_custom_defined": "0",
+    "name": "Doron Velta (Normal)",
+    "print_settings_id": "Doron Velta (Normal)",
+    "version": "1.7.0.2"
+}
