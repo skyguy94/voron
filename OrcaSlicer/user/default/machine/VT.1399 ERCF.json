@@ -9,7 +9,7 @@
     "layer_change_gcode": ";AFTER_LAYER_CHANGE\n_MMU_UPDATE_HEIGHT",
     "machine_end_gcode": "MMU_END\nPRINT_END",
     "machine_load_filament_time": "30",
-    "machine_start_gcode": "MMU_START_SETUP INITIAL_TOOL={initial_tool} REFERENCED_TOOLS=!referenced_tools! TOOL_COLORS=!colors! TOOL_TEMPS=!temperatures! TOOL_MATERIALS=!materials! PURGE_VOLUMES=!purge_volumes!\n\nPRINT_WARMUP BED=[first_layer_bed_temperature[initial_tool]] CHAMBER=[chamber_temperature[initial_tool]] EXTRUDER_IDLE=[idle_temperature[initial_tool]]\n\nPRINT_START BED=[first_layer_bed_temperature[initial_tool]] EXTRUDER=[first_layer_temperature[initial_tool]] EXTRUDER_IDLE=[idle_temperature[initial_tool]] \n\nMMU_START_CHECK\n\nMMU_START_LOAD_INITIAL_TOOL\nLINE_PURGE",
+    "machine_start_gcode": "MMU_START_SETUP INITIAL_TOOL={initial_tool} REFERENCED_TOOLS=!referenced_tools! TOOL_COLORS=!colors! TOOL_TEMPS=!temperatures! TOOL_MATERIALS=!materials! PURGE_VOLUMES=!purge_volumes!\n\nPRINT_WARMUP BED=[first_layer_bed_temperature[initial_tool]] CHAMBER=[chamber_temperature[initial_tool]] EXTRUDER=260\n\nPRINT_START BED=[first_layer_bed_temperature[initial_tool]] EXTRUDER=[first_layer_temperature[initial_tool]] EXTRUDER_IDLE=[idle_temperature[initial_tool]] \n\nMMU_START_CHECK\n\nMMU_START_LOAD_INITIAL_TOOL\nLINE_PURGE",
     "machine_unload_filament_time": "22",
     "name": "VT.1399 ERCF",
     "nozzle_type": "brass",

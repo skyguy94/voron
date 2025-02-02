@@ -8,7 +8,7 @@
     "is_custom_defined": "0",
     "layer_change_gcode": ";AFTER_LAYER_CHANGE\n_MMU_UPDATE_HEIGHT",
     "machine_load_filament_time": "30",
-    "machine_start_gcode": "MMU ENABLE=0\n\nPRINT_WARMUP BED=[first_layer_bed_temperature[initial_tool]] CHAMBER=[chamber_temperature[initial_tool]] EXTRUDER_IDLE=[idle_temperature[initial_tool]]\n\nPRINT_START BED=[first_layer_bed_temperature[initial_tool]] EXTRUDER=[first_layer_temperature[initial_tool]] EXTRUDER_IDLE=[idle_temperature[initial_tool]] \n\nLINE_PURGE",
+    "machine_start_gcode": "MMU ENABLE=0\n\nPRINT_WARMUP BED=[first_layer_bed_temperature[initial_tool]] CHAMBER=[chamber_temperature[initial_tool]] EXTRUDER=260\n\nPRINT_START BED=[first_layer_bed_temperature[initial_tool]] EXTRUDER=[first_layer_temperature[initial_tool]] EXTRUDER_IDLE=[idle_temperature[initial_tool]] \n\nLINE_PURGE",
     "machine_unload_filament_time": "22",
     "name": "VT.1399 ERCF (MMU Disabled)",
     "nozzle_type": "brass",
