@@ -1,4 +1,7 @@
 {
+    "filament_flow_ratio": [
+        "0.94"
+    ],
     "filament_settings_id": [
         "PLA (Temp is off)"
     ],
