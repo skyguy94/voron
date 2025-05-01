@@ -1,6 +1,6 @@
 {
     "activate_air_filtration": [
-        "1"
+        "0"
     ],
     "activate_chamber_temp_control": [
         "0"
@@ -21,14 +21,12 @@
         "0"
     ],
     "chamber_temperature": [
-        "0"
+        "40"
     ],
     "close_fan_the_first_x_layers": [
-        "3"
+        "4"
     ],
-    "compatible_printers": [
-        "Doron Velta 0.4 nozzle"
-    ],
+    "compatible_printers": [],
     "compatible_printers_condition": "",
     "compatible_prints": [],
     "compatible_prints_condition": "",
@@ -57,28 +55,28 @@
         "0"
     ],
     "eng_plate_temp": [
-        "90"
+        "100"
     ],
     "eng_plate_temp_initial_layer": [
-        "90"
+        "105"
     ],
     "fan_cooling_layer_time": [
         "30"
     ],
     "fan_max_speed": [
-        "80"
+        "35"
     ],
     "fan_min_speed": [
-        "10"
+        "35"
     ],
     "filament_cooling_final_speed": [
-        "3.4"
+        "0"
     ],
     "filament_cooling_initial_speed": [
-        "2.2"
+        "0"
     ],
     "filament_cooling_moves": [
-        "4"
+        "0"
     ],
     "filament_cost": [
         "20"
@@ -93,26 +91,25 @@
         "1.75"
     ],
     "filament_end_gcode": [
-        "; filament end gcode \nM106 P3 S0\n"
+        "; filament end gcode\n"
     ],
     "filament_flow_ratio": [
-        "1"
+        "0.926"
     ],
-    "filament_id": "P5c9bfff",
     "filament_is_support": [
         "0"
     ],
     "filament_loading_speed": [
-        "28"
+        "0"
     ],
     "filament_loading_speed_start": [
-        "3"
+        "0"
     ],
     "filament_long_retractions_when_cut": [
         "nil"
     ],
     "filament_max_volumetric_speed": [
-        "28.6"
+        "15"
     ],
     "filament_minimal_purge_on_wipe_tower": [
         "15"
@@ -130,7 +127,7 @@
         ""
     ],
     "filament_ramming_parameters": [
-        "120 100 6.6 6.8 7.2 7.6 7.9 8.2 8.7 9.4 9.9 10.0| 0.05 6.6 0.45 6.8 0.95 7.8 1.45 8.3 1.95 9.7 2.45 10 2.95 7.6 3.45 7.6 3.95 7.6 4.45 7.6 4.95 7.6"
+        "120 100 6.62366 6.75269 6.88172 7.01075 7.31183 7.78495 8.34409 8.88172 9.26882 9.52688 9.74194 9.89247| 0.05 6.6 0.45 6.8 0.95 7.06882 1.45 7.99892 1.95 9.09785 2.45 9.6129 2.95 9.96559 3.45 7.6 3.95 7.6 4.45 7.6 4.95 7.6"
     ],
     "filament_retract_before_wipe": [
         "nil"
@@ -163,7 +160,7 @@
         "nil"
     ],
     "filament_settings_id": [
-        "Generic ABS template @Doron Velta 0.4 nozzle"
+        "eSUN ABS+"
     ],
     "filament_shrink": [
         "100%"
@@ -181,7 +178,7 @@
         "0"
     ],
     "filament_start_gcode": [
-        "; Filament gcode\n{if activate_air_filtration[current_extruder] && support_air_filtration}\nM106 P3 S{during_print_exhaust_fan_speed_num[current_extruder]} \n{endif}"
+        "; Filament gcode\n"
     ],
     "filament_toolchange_delay": [
         "0"
@@ -190,13 +187,13 @@
         "ABS"
     ],
     "filament_unloading_speed": [
-        "90"
+        "0"
     ],
     "filament_unloading_speed_start": [
-        "100"
+        "0"
     ],
     "filament_vendor": [
-        "Generic"
+        "eSUN"
     ],
     "filament_wipe": [
         "nil"
@@ -215,22 +212,25 @@
         "0"
     ],
     "hot_plate_temp": [
-        "90"
+        "110"
     ],
     "hot_plate_temp_initial_layer": [
-        "90"
+        "110"
     ],
     "idle_temperature": [
-        "0"
+        "150"
     ],
-    "inherits": "",
+    "inherits": "Voron Generic ABS",
+    "internal_bridge_fan_speed": [
+        "-1"
+    ],
     "is_custom_defined": "0",
-    "name": "Generic ABS template @Doron Velta 0.4 nozzle",
+    "name": "eSUN ABS+",
     "nozzle_temperature": [
-        "270"
+        "250"
     ],
     "nozzle_temperature_initial_layer": [
-        "260"
+        "250"
     ],
     "nozzle_temperature_range_high": [
         "280"
@@ -263,25 +263,31 @@
         "3"
     ],
     "slow_down_min_speed": [
-        "20"
+        "10"
+    ],
+    "supertack_plate_temp": [
+        "0"
+    ],
+    "supertack_plate_temp_initial_layer": [
+        "0"
     ],
     "support_material_interface_fan_speed": [
         "-1"
     ],
     "temperature_vitrification": [
-        "100"
+        "110"
     ],
     "textured_cool_plate_temp": [
-        "40"
+        "0"
     ],
     "textured_cool_plate_temp_initial_layer": [
-        "40"
+        "0"
     ],
     "textured_plate_temp": [
-        "90"
+        "100"
     ],
     "textured_plate_temp_initial_layer": [
-        "90"
+        "105"
     ],
-    "version": "1.7.0.2"
+    "version": "2.2.0.0"
 }
