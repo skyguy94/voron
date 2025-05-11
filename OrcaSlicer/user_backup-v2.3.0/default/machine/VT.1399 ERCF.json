@@ -1,0 +1,34 @@
+{
+    "cooling_tube_length": "20",
+    "cooling_tube_retraction": "40",
+    "emit_machine_limits_to_gcode": "0",
+    "extra_loading_move": "-39.99",
+    "from": "User",
+    "inherits": "Voron Trident 300 0.4 nozzle",
+    "is_custom_defined": "0",
+    "layer_change_gcode": ";AFTER_LAYER_CHANGE\n_MMU_UPDATE_HEIGHT",
+    "machine_end_gcode": "MMU_END\nPRINT_END",
+    "machine_load_filament_time": "30",
+    "machine_start_gcode": "MMU_START_SETUP INITIAL_TOOL={initial_tool} TOTAL_TOOLCHANGES=!total_toolchanges! REFERENCED_TOOLS=!referenced_tools! TOOL_COLORS=!colors! TOOL_TEMPS=!temperatures! TOOL_MATERIALS=!materials! FILAMENT_NAMES=!filament_names! PURGE_VOLUMES=!purge_volumes!\n\nPRINT_WARMUP BED=[first_layer_bed_temperature[initial_tool]] CHAMBER=[chamber_temperature[initial_tool]] EXTRUDER=260\nPRINT_START BED=[first_layer_bed_temperature[initial_tool]] EXTRUDER=[first_layer_temperature[initial_tool]] EXTRUDER_IDLE=[idle_temperature[initial_tool]] \n\nMMU_START_CHECK\n\nMMU_START_LOAD_INITIAL_TOOL\nLINE_PURGE",
+    "machine_unload_filament_time": "22",
+    "min_layer_height": [
+        "0.08"
+    ],
+    "name": "VT.1399 ERCF",
+    "nozzle_type": "brass",
+    "parking_pos_retraction": "40",
+    "print_host": "https://trident.local",
+    "printer_settings_id": "VT.1399 ERCF",
+    "printhost_ssl_ignore_revoke": "1",
+    "retract_length_toolchange": [
+        "0"
+    ],
+    "retraction_speed": [
+        "60"
+    ],
+    "support_multi_bed_types": "1",
+    "version": "2.1.1.0",
+    "wipe": [
+        "0"
+    ]
+}
