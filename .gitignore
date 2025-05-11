@@ -10,6 +10,6 @@ OrcaSlicer/ota/**
 OrcaSlicer/printers/**
 OrcaSlicer/system/**
 OrcaSlicer/user/hints.cereal
-OrcaSlicer.conf
+OrcaSlicer/user_backup*/**
 OrcaSlicer.conf.bak
 database/**
