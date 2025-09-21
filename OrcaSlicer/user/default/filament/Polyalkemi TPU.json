@@ -73,13 +73,13 @@
         "0"
     ],
     "filament_cooling_final_speed": [
-        "3.5"
+        "0"
     ],
     "filament_cooling_initial_speed": [
-        "10"
+        "0"
     ],
     "filament_cooling_moves": [
-        "3"
+        "0"
     ],
     "filament_cost": [
         "0"
@@ -103,10 +103,10 @@
         "0"
     ],
     "filament_loading_speed": [
-        "80"
+        "0"
     ],
     "filament_loading_speed_start": [
-        "80"
+        "0"
     ],
     "filament_long_retractions_when_cut": [
         "nil"
@@ -175,10 +175,10 @@
         "0"
     ],
     "filament_stamping_distance": [
-        "40"
+        "0"
     ],
     "filament_stamping_loading_speed": [
-        "30"
+        "0"
     ],
     "filament_start_gcode": [
         " "
@@ -190,10 +190,10 @@
         "TPU"
     ],
     "filament_unloading_speed": [
-        "20"
+        "0"
     ],
     "filament_unloading_speed_start": [
-        "120"
+        "0"
     ],
     "filament_vendor": [
         "Polyalkami"

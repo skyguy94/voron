@@ -73,13 +73,13 @@
         "35"
     ],
     "filament_cooling_final_speed": [
-        "3.5"
+        "0"
     ],
     "filament_cooling_initial_speed": [
-        "10"
+        "0"
     ],
     "filament_cooling_moves": [
-        "3"
+        "0"
     ],
     "filament_cost": [
         "20"
@@ -97,16 +97,16 @@
         "; filament end gcode\n"
     ],
     "filament_flow_ratio": [
-        "0.95"
+        "0.94"
     ],
     "filament_is_support": [
         "0"
     ],
     "filament_loading_speed": [
-        "80"
+        "0"
     ],
     "filament_loading_speed_start": [
-        "80"
+        "0"
     ],
     "filament_long_retractions_when_cut": [
         "nil"
@@ -175,10 +175,10 @@
         "0"
     ],
     "filament_stamping_distance": [
-        "40"
+        "0"
     ],
     "filament_stamping_loading_speed": [
-        "30"
+        "0"
     ],
     "filament_start_gcode": [
         "; Filament gcode\n"
@@ -190,10 +190,10 @@
         "ABS"
     ],
     "filament_unloading_speed": [
-        "20"
+        "0"
     ],
     "filament_unloading_speed_start": [
-        "120"
+        "0"
     ],
     "filament_vendor": [
         "Fiberlogy"
@@ -227,6 +227,9 @@
     "internal_bridge_fan_speed": [
         "-1"
     ],
+    "ironing_fan_speed": [
+        "-1"
+    ],
     "is_custom_defined": "0",
     "name": "Fiberlogy ABS",
     "nozzle_temperature": [
@@ -239,7 +242,7 @@
         "280"
     ],
     "nozzle_temperature_range_low": [
-        "240"
+        "230"
     ],
     "overhang_fan_speed": [
         "80"
