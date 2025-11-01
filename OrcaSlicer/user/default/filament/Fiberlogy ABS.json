@@ -67,10 +67,10 @@
         "30"
     ],
     "fan_max_speed": [
-        "35"
+        "10"
     ],
     "fan_min_speed": [
-        "35"
+        "10"
     ],
     "filament_cooling_final_speed": [
         "0"
