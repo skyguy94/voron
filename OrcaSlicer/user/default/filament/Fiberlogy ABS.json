@@ -67,10 +67,10 @@
         "30"
     ],
     "fan_max_speed": [
-        "10"
+        "20"
     ],
     "fan_min_speed": [
-        "10"
+        "20"
     ],
     "filament_cooling_final_speed": [
         "0"
@@ -233,10 +233,10 @@
     "is_custom_defined": "0",
     "name": "Fiberlogy ABS",
     "nozzle_temperature": [
-        "255"
+        "250"
     ],
     "nozzle_temperature_initial_layer": [
-        "255"
+        "250"
     ],
     "nozzle_temperature_range_high": [
         "280"
@@ -245,7 +245,7 @@
         "230"
     ],
     "overhang_fan_speed": [
-        "80"
+        "60"
     ],
     "overhang_fan_threshold": [
         "25%"

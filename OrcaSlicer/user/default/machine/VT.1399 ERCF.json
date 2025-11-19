@@ -16,10 +16,11 @@
         "0.04"
     ],
     "name": "VT.1399 ERCF",
-    "nozzle_type": "hardened_steel",
+    "nozzle_type": "brass",
     "parking_pos_retraction": "0",
     "print_host": "https://192.168.1.26",
     "printer_settings_id": "VT.1399 ERCF",
+    "printhost_cafile": "D:Projectsvoron-modstrident.local.crt",
     "printhost_ssl_ignore_revoke": "1",
     "retract_length_toolchange": [
         "0"
