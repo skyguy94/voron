@@ -1,0 +1,6 @@
+*.bkp
+*.png
+*.csv
+*.backup
+printer-*.cfg
+mmu/mmu_vars.cfg
