@@ -11,6 +11,7 @@ OrcaSlicer/printers/**
 OrcaSlicer/system/**
 OrcaSlicer/user/hints.cereal
 OrcaSlicer/user_backup*/**
+OrcaSlicer/.orcaslicer_machine_id
 OrcaSlicer.conf
 OrcaSlicer.conf.bak
 database/**
