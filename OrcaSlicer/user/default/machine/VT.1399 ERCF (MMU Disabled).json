@@ -17,7 +17,7 @@
 		"brass"
 	],
 	"parking_pos_retraction": "0",
-	"print_host": "https://trident.lan",
+	"print_host": "https://192.168.1.26",
 	"printer_extruder_id": [
 		"1"
 	],
