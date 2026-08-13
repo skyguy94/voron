@@ -30,10 +30,10 @@
 		"0"
 	],
 	"chamber_minimal_temperature": [
-		"0"
+		"60"
 	],
 	"chamber_temperature": [
-		"50"
+		"65"
 	],
 	"close_additional_fan_first_x_layers": [
 		"1"
