@@ -17,9 +17,9 @@
     "cooling_tube_length": "5",
     "cooling_tube_retraction": "91.5",
     "default_filament_profile": [
-        "FLSun Generic PLA"
+        "PLA (Temp is off)"
     ],
-    "default_print_profile": "0.20mm Standard @FLSun Q5",
+    "default_print_profile": "Doron Velta Standard",
     "deretraction_speed": [
         "40"
     ],
@@ -228,7 +228,7 @@
     "printer_variant": "0.4",
     "printhost_apikey": "",
     "printhost_authorization_type": "key",
-    "printhost_cafile": "",
+    "printhost_cafile": "D:/Projects/voron-mods/pki/voron-home-ca.crt",
     "printhost_password": "",
     "printhost_port": "",
     "printhost_ssl_ignore_revoke": "0",
