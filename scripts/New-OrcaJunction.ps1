@@ -6,7 +6,7 @@
     OrcaSlicer only reads its configuration from %APPDATA%\OrcaSlicer and that's
     annoying if you want to check your configuration into source control.
 
-    This script creates a junction from %APPDATA%\OrcaSlicer to the repo of your 
+    This script creates a junction from %APPDATA%\OrcaSlicer to the repo of your
     choice via a junction which can be created without elevation or Developer Mode.
 
     Close OrcaSlicer first; it rewrites its configuration on exit.

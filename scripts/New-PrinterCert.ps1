@@ -3,7 +3,7 @@
     Issues printer TLS certificates from a local name-constrained root CA.
 
 .DESCRIPTION
-    This cert is used to create and install a root ca cert that it can also
+    This script is used to create and install a root ca cert that it can also
     use to generate leaf certificates for encrypting 3d printer traffic.
 
     Requires openssl, which ships with Git for Windows.

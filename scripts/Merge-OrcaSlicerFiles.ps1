@@ -3,13 +3,13 @@
     Flattens OrcaSlicer user presets so each one is self-contained ("fork and modify").
 
 .DESCRIPTION
-    The heirarchical dependencies that OrcaSlicer creates from its default profiles
+    The hierarchical dependencies that OrcaSlicer creates from its default profiles
     for printer, process, and filament settings are annoying and require you to keep
-     all sorts of system presents around that you absolutely do not care about if 
-     you do anything custom.
+    all sorts of system presets around that you absolutely do not care about if
+    you do anything custom.
 
     This script goes through and figures out the final rendered versions of those settings
-    and flatens them into a single file.
+    and flattens them into a single file.
 
     Presets that are already flat are left untouched, so the script is idempotent and
     safe to re-run.
@@ -18,7 +18,7 @@
     List every preset with its inheritance chain and exit without writing anything.
 
 .PARAMETER Kind
-    Which kinds of preset to flatten. Can be one or all of 'machine', 'process', or 'filament' 
+    Which kinds of preset to flatten. Can be one or all of 'machine', 'process', or 'filament'.
 
 .PARAMETER RepoRoot
     The root of the repo to work on. Defaults to the script's parent folder.
