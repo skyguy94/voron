@@ -212,7 +212,7 @@
     "printer_variant": "0.4",
     "printhost_apikey": "",
     "printhost_authorization_type": "key",
-    "printhost_cafile": "D:/Projects/voron-mods/pki/voron-home-ca.crt",
+    "printhost_cafile": "D:/Projects/voron/certs/voron-home-ca.crt",
     "printhost_password": "",
     "printhost_port": "",
     "printhost_ssl_ignore_revoke": "1",

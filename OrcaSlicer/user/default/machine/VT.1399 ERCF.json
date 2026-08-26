@@ -118,7 +118,7 @@
     ],
     "nozzle_type": "brass",
     "parking_pos_retraction": "0",
-    "print_host": "https://192.168.1.26",
+    "print_host": "https://trident.lan",
     "printable_area": [
         "0x0",
         "300x0",
@@ -130,7 +130,7 @@
     "printer_settings_id": "VT.1399 ERCF",
     "printer_technology": "FFF",
     "printer_variant": "0.4",
-    "printhost_cafile": "D:/Projects/voron-mods/pki/voron-home-ca.crt",
+    "printhost_cafile": "D:/Projects/voron/certs/voron-home-ca.crt",
     "printhost_ssl_ignore_revoke": "1",
     "retract_before_wipe": [
         "70%"

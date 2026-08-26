@@ -3,20 +3,31 @@
     Flattens OrcaSlicer user presets so each one is self-contained ("fork and modify").
 
 .DESCRIPTION
-    A user preset with a non-empty "inherits" resolves its remaining values from the
-    vendor bundle under OrcaSlicer\system, which is not tracked in this repo and is
-    rewritten by OrcaSlicer on update. This script walks the inheritance chain, merges
-    every inherited key into the preset itself (child values always win), and clears
-    "inherits" plus the vendor link in the .info sidecar.
+    The heirarchical dependencies that OrcaSlicer creates from its default profiles
+    for printer, process, and filament settings are annoying and require you to keep
+     all sorts of system presents around that you absolutely do not care about if 
+     you do anything custom.
+
+    This script goes through and figures out the final rendered versions of those settings
+    and flatens them into a single file.
 
     Presets that are already flat are left untouched, so the script is idempotent and
-    safe to re-run after adding a new preset from a vendor base.
-
-    Close OrcaSlicer before running: %APPDATA%\OrcaSlicer is a symlink into this repo
-    and OrcaSlicer rewrites user presets on exit.
+    safe to re-run.
 
 .PARAMETER Report
     List every preset with its inheritance chain and exit without writing anything.
+
+.PARAMETER Kind
+    Which kinds of preset to flatten. Can be one or all of 'machine', 'process', or 'filament' 
+
+.PARAMETER RepoRoot
+    The root of the repo to work on. Defaults to the script's parent folder.
+
+.PARAMETER UserRoot
+    Where the user presets live. The default should be sufficient.
+
+.PARAMETER SystemRoot
+    Where the system presets live. The default should be sufficient.
 
 .EXAMPLE
     .\Merge-OrcaSlicerFiles.ps1 -Report
@@ -27,8 +38,9 @@
 #>
 [CmdletBinding(SupportsShouldProcess)]
 param(
-    [string] $UserRoot   = (Join-Path $PSScriptRoot 'OrcaSlicer\user\default'),
-    [string] $SystemRoot = (Join-Path $PSScriptRoot 'OrcaSlicer\system'),
+    [string] $RepoRoot = (Split-Path -Parent $PSScriptRoot),
+    [string] $UserRoot = (Join-Path $RepoRoot 'OrcaSlicer\user\default'),
+    [string] $SystemRoot = (Join-Path $RepoRoot 'OrcaSlicer\system'),
     [ValidateSet('machine', 'process', 'filament')]
     [string[]] $Kind = @('machine', 'process', 'filament'),
     [switch] $Report
