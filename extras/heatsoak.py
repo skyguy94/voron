@@ -72,6 +72,12 @@ class HeatSoak:
     def _temperature(self, name):
         return self.printer.lookup_object(name).get_status(self.reactor.monotonic())['temperature']
 
+    def _heater(self, name):
+        return self.printer.lookup_object('heaters').lookup_heater(name)
+
+    def _heater_status(self, name):
+        return self._heater(name).get_status(self.reactor.monotonic())
+
     def _slope_of(self, series):
         slope, _ = statistics.linear_regression(range(len(series)), series)
         return slope * 60. / self.check_interval
@@ -119,7 +125,7 @@ class HeatSoak:
         self.timeout = gcmd.get_float('TIMEOUT', 30., above=0.) * 60.
         self._push(self._temperature(self.soaker_name))
         if self.heater_name and self.target_temp:
-            self.printer.lookup_object('heaters').lookup_heater(self.heater_name).set_temp(self.target_temp)
+            self._heater(self.heater_name).set_temp(self.target_temp)
             self.stage = 'heating'
         else:
             self.stage = 'soaking'
@@ -127,7 +133,18 @@ class HeatSoak:
         self.reactor.update_timer(self.timer, self.reactor.NOW)
 
     def cmd_STOP_HEAT_SOAK(self, gcmd):
+        if self.stage not in ('heating', 'soaking'):
+            gcmd.respond_info("No heat soak is running.")
+            return
+        stage = self.stage
+        heater = self.heater_name
         self.stop()
+        if heater:
+            target = self._heater_status(heater).get('target', 0.)
+            gcmd.respond_info("Heat soak stopped during %s. %s still targeting %.0fC."
+                              % (stage, heater, target))
+        else:
+            gcmd.respond_info("Heat soak stopped during %s." % (stage,))
 
     def cmd_CANCEL_HEAT_SOAK(self, gcmd):
         if self.stage in ('heating', 'soaking'):
@@ -154,7 +171,7 @@ class HeatSoak:
         self.elapsed += self.check_interval
         self._push(self._temperature(self.soaker_name))
         if self.stage == 'heating':
-            heater_temp = self._temperature(self.heater_name)
+            heater_temp = self._heater_status(self.heater_name)['temperature']
             if heater_temp < self.target_temp:
                 return self._report(eventtime, "Heating -- %.1fC / %.1fC -- %.1fm elapsed"
                                     % (heater_temp, self.target_temp, self.elapsed / 60.))
