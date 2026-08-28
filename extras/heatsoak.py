@@ -6,6 +6,8 @@ from collections import deque
 class HeatSoak:
     cmd_HEAT_SOAK_help = "Drive a heater and wait for a second sensor to settle"
     cmd_STOP_HEAT_SOAK_help = "Stop an in-progress heat soak without running callbacks"
+    cmd_CANCEL_HEAT_SOAK_help = "Stop an in-progress heat soak and run its cancel callback"
+    cmd_SKIP_HEAT_SOAK_help = "Skip the remaining soak, running the complete callback when the heater arrives"
 
     def __init__(self, config):
         self.printer = config.get_printer()
@@ -24,6 +26,9 @@ class HeatSoak:
         self.printer.register_event_handler("virtual_sdcard:reset_file", self._handle_reset_file)
         self.gcode.register_command('HEAT_SOAK', self.cmd_HEAT_SOAK, desc=self.cmd_HEAT_SOAK_help)
         self.gcode.register_command('STOP_HEAT_SOAK', self.cmd_STOP_HEAT_SOAK, desc=self.cmd_STOP_HEAT_SOAK_help)
+        self.gcode.register_command('CANCEL_HEAT_SOAK', self.cmd_CANCEL_HEAT_SOAK,
+                                    desc=self.cmd_CANCEL_HEAT_SOAK_help)
+        self.gcode.register_command('SKIP_HEAT_SOAK', self.cmd_SKIP_HEAT_SOAK, desc=self.cmd_SKIP_HEAT_SOAK_help)
 
     def _reset(self):
         self.stage = 'idle'
@@ -39,8 +44,11 @@ class HeatSoak:
         self.elapsed = 0.
         self.flat_time = 0.
         self.next_report = 0.
-        self.samples = deque(maxlen=max(1, int(self.temp_smooth_time / self.check_interval)))
-        self.smoothed = deque(maxlen=max(2, int(self.rate_smooth_time / self.check_interval)))
+        self.resume_trigger = False
+        self.sample_window = max(1, int(self.temp_smooth_time / self.check_interval))
+        self.rate_window = max(2, int(self.rate_smooth_time / self.check_interval))
+        self.samples = deque(maxlen=self.sample_window)
+        self.smoothed = deque(maxlen=self.rate_window)
         self.slope = None
         self.soak_temp = None
 
@@ -56,7 +64,7 @@ class HeatSoak:
         return {'stage': self.stage, 'soak_temp': self.soak_temp, 'slope': self.slope,
                 'elapsed': self.elapsed, 'remaining': max(0., self.timeout - self.elapsed),
                 'flat_time': self.flat_time, 'target_temp': self.target_temp,
-                'min_soak_temp': self.min_soak_temp}
+                'min_soak_temp': self.min_soak_temp, 'resume_trigger': self.resume_trigger}
 
     def _respond(self, msg):
         self.gcode.respond_info(msg)
@@ -70,11 +78,11 @@ class HeatSoak:
 
     def _push(self, temp):
         self.samples.append(temp)
-        if len(self.samples) < self.samples.maxlen:
+        if len(self.samples) < self.sample_window:
             return
         self.soak_temp = statistics.fmean(self.samples)
         self.smoothed.append(self.soak_temp)
-        if len(self.smoothed) == self.smoothed.maxlen:
+        if len(self.smoothed) == self.rate_window:
             self.slope = self._slope_of(self.smoothed)
 
     def stop(self):
@@ -82,15 +90,20 @@ class HeatSoak:
         if self.timer is not None:
             self.reactor.update_timer(self.timer, self.reactor.NEVER)
 
-    def _finish(self, outcome):
+    def _finish(self, outcome, from_command=False):
         self.stage = outcome
+        if self.timer is not None:
+            self.reactor.update_timer(self.timer, self.reactor.NEVER)
         template = self.complete_gcode if outcome == 'done' else self.cancel_gcode
         script = template.render()
         if script.strip():
             try:
-                self.gcode.run_script(script)
+                if from_command:
+                    self.gcode.run_script_from_command(script)
+                else:
+                    self.gcode.run_script(script)
             except Exception:
-                logging.exception("heat_soak %s gcode" % (outcome,))
+                logging.exception("heatsoak %s gcode" % (outcome,))
         return self.reactor.NEVER
 
     def cmd_HEAT_SOAK(self, gcmd):
@@ -116,6 +129,17 @@ class HeatSoak:
     def cmd_STOP_HEAT_SOAK(self, gcmd):
         self.stop()
 
+    def cmd_CANCEL_HEAT_SOAK(self, gcmd):
+        if self.stage in ('heating', 'soaking'):
+            self._finish('cancel', from_command=True)
+
+    def cmd_SKIP_HEAT_SOAK(self, gcmd):
+        if self.stage == 'heating':
+            self.resume_trigger = True
+        elif self.stage == 'soaking':
+            self._respond("Heat soak skipped after %.1fm" % (self.elapsed / 60.,))
+            self._finish('done', from_command=True)
+
     def _report(self, eventtime, msg):
         if self.elapsed >= self.next_report:
             self.next_report = self.elapsed + self.report_interval
@@ -134,6 +158,9 @@ class HeatSoak:
             if heater_temp < self.target_temp:
                 return self._report(eventtime, "Heating -- %.1fC / %.1fC -- %.1fm elapsed"
                                     % (heater_temp, self.target_temp, self.elapsed / 60.))
+            if self.resume_trigger:
+                self._respond("Heating complete after %.1fm, soak skipped." % (self.elapsed / 60.,))
+                return self._finish('done')
             self._respond("Heating complete after %.1fm, starting soak." % (self.elapsed / 60.,))
             self.stage = 'soaking'
             self.elapsed = 0.
