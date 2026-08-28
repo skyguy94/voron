@@ -57,7 +57,7 @@ class HeatSoak:
 
     def _handle_reset_file(self):
         if self.stage in ('heating', 'soaking'):
-            self._respond("Heat soak stopped: print file was reset.")
+            self._respond("Heat soak stopped, the print file was reset.")
             self.stop()
 
     def get_status(self, eventtime):
@@ -68,6 +68,19 @@ class HeatSoak:
 
     def _respond(self, msg):
         self.gcode.respond_info(msg)
+
+    def _label(self, name):
+        label = name.split(' ')[-1]
+        return {'heater_bed': 'bed', 'extruder': 'hotend',
+                'chamber_heater': 'chamber'}.get(label, label.replace('_', ' '))
+
+    def _elapsed_text(self, seconds):
+        minutes = int(round(seconds / 60.))
+        if minutes < 1:
+            return "under a minute"
+        if minutes < 60:
+            return "%d min" % (minutes,)
+        return "%dh %02dm" % (minutes // 60, minutes % 60)
 
     def _temperature(self, name):
         return self.printer.lookup_object(name).get_status(self.reactor.monotonic())['temperature']
@@ -127,24 +140,28 @@ class HeatSoak:
         if self.heater_name and self.target_temp:
             self._heater(self.heater_name).set_temp(self.target_temp)
             self.stage = 'heating'
+            self._respond("Heat soak started. Warming the %s to %.0f °C, then holding until the %s settles."
+                          % (self._label(self.heater_name), self.target_temp,
+                             self._label(self.soaker_name)))
         else:
             self.stage = 'soaking'
-        self._respond("Heat soak starting")
+            self._respond("Heat soak started. Holding until the %s settles."
+                          % (self._label(self.soaker_name),))
         self.reactor.update_timer(self.timer, self.reactor.NOW)
 
     def cmd_STOP_HEAT_SOAK(self, gcmd):
         if self.stage not in ('heating', 'soaking'):
             gcmd.respond_info("No heat soak is running.")
             return
-        stage = self.stage
+        phase = "warming up" if self.stage == 'heating' else "soaking"
         heater = self.heater_name
         self.stop()
         if heater:
             target = self._heater_status(heater).get('target', 0.)
-            gcmd.respond_info("Heat soak stopped during %s. %s still targeting %.0fC."
-                              % (stage, heater, target))
+            gcmd.respond_info("Heat soak stopped while %s. The %s is still set to %.0f °C."
+                              % (phase, self._label(heater), target))
         else:
-            gcmd.respond_info("Heat soak stopped during %s." % (stage,))
+            gcmd.respond_info("Heat soak stopped while %s." % (phase,))
 
     def cmd_CANCEL_HEAT_SOAK(self, gcmd):
         if self.stage in ('heating', 'soaking'):
@@ -154,7 +171,7 @@ class HeatSoak:
         if self.stage == 'heating':
             self.resume_trigger = True
         elif self.stage == 'soaking':
-            self._respond("Heat soak skipped after %.1fm" % (self.elapsed / 60.,))
+            self._respond("Soak skipped after %s." % (self._elapsed_text(self.elapsed),))
             self._finish('done', from_command=True)
 
     def _report(self, eventtime, msg):
@@ -173,12 +190,17 @@ class HeatSoak:
         if self.stage == 'heating':
             heater_temp = self._heater_status(self.heater_name)['temperature']
             if heater_temp < self.target_temp:
-                return self._report(eventtime, "Heating -- %.1fC / %.1fC -- %.1fm elapsed"
-                                    % (heater_temp, self.target_temp, self.elapsed / 60.))
+                return self._report(eventtime, "Warming up: %s at %.0f of %.0f °C, %s so far."
+                                    % (self._label(self.heater_name), heater_temp,
+                                       self.target_temp, self._elapsed_text(self.elapsed)))
             if self.resume_trigger:
-                self._respond("Heating complete after %.1fm, soak skipped." % (self.elapsed / 60.,))
+                self._respond("The %s reached %.0f °C after %s. Soak skipped."
+                              % (self._label(self.heater_name), self.target_temp,
+                                 self._elapsed_text(self.elapsed)))
                 return self._finish('done')
-            self._respond("Heating complete after %.1fm, starting soak." % (self.elapsed / 60.,))
+            self._respond("The %s reached %.0f °C after %s. Soaking now."
+                          % (self._label(self.heater_name), self.target_temp,
+                             self._elapsed_text(self.elapsed)))
             self.stage = 'soaking'
             self.elapsed = 0.
             self.next_report = 0.
@@ -186,23 +208,30 @@ class HeatSoak:
 
     def _soak(self, eventtime):
         if self.elapsed >= self.timeout:
-            self._respond("Heat soak timed out after %.1fm" % (self.elapsed / 60.,))
+            self._respond("Heat soak hit its %s limit before the %s settled."
+                          % (self._elapsed_text(self.timeout), self._label(self.soaker_name)))
             return self._finish('cancel')
         if self.slope is None or self.soak_temp is None:
-            return self._report(eventtime, "Soaking -- settling -- %.1fm elapsed" % (self.elapsed / 60.,))
+            return self._report(eventtime, "Soaking: taking the first %s readings, %s in."
+                                % (self._label(self.soaker_name),
+                                   self._elapsed_text(self.elapsed)))
         self.flat_time = self.flat_time + self.check_interval if abs(self.slope) <= self.flat_rate else 0.
         plateaued = (self.flat_hold > 0. and self.flat_time >= self.flat_hold
                      and (self.soak_floor <= 0. or self.soak_temp >= self.soak_floor))
         below_target = self.min_soak_temp > 0. and self.soak_temp < self.min_soak_temp
         if self.slope > self.target_rate or (below_target and not plateaued):
-            return self._report(eventtime, "Soaking -- %.1fC, %.3fC/m -- %.1fm elapsed, %.1fm left"
-                                % (self.soak_temp, self.slope, self.elapsed / 60.,
-                                   (self.timeout - self.elapsed) / 60.))
+            return self._report(eventtime, "Soaking: %s at %.0f °C, %+.1f °C/min. %s in, up to %s left."
+                                % (self._label(self.soaker_name), self.soak_temp, self.slope,
+                                   self._elapsed_text(self.elapsed),
+                                   self._elapsed_text(self.timeout - self.elapsed)))
         if below_target:
-            self._respond("Heat soak plateaued after %.1fm at %.1fC, short of %.1fC. Moving on."
-                          % (self.elapsed / 60., self.soak_temp, self.min_soak_temp))
+            self._respond("The %s levelled off at %.0f °C after %s, short of %.0f °C. Moving on."
+                          % (self._label(self.soaker_name), self.soak_temp,
+                             self._elapsed_text(self.elapsed), self.min_soak_temp))
         else:
-            self._respond("Heat soak complete after %.1fm at %.1fC." % (self.elapsed / 60., self.soak_temp))
+            self._respond("Heat soak done after %s. The %s is at %.0f °C."
+                          % (self._elapsed_text(self.elapsed), self._label(self.soaker_name),
+                             self.soak_temp))
         return self._finish('done')
 
 
