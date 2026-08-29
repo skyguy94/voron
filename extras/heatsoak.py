@@ -190,7 +190,7 @@ class HeatSoak:
         if self.stage == 'heating':
             heater_temp = self._heater_status(self.heater_name)['temperature']
             if heater_temp < self.target_temp:
-                return self._report(eventtime, "Warming up: %s at %.0f of %.0f °C, %s so far."
+                return self._report(eventtime, "Warming up: %s at %.0f of %.0f °C, %s elapsed."
                                     % (self._label(self.heater_name), heater_temp,
                                        self.target_temp, self._elapsed_text(self.elapsed)))
             if self.resume_trigger:
@@ -212,7 +212,7 @@ class HeatSoak:
                           % (self._elapsed_text(self.timeout), self._label(self.soaker_name)))
             return self._finish('cancel')
         if self.slope is None or self.soak_temp is None:
-            return self._report(eventtime, "Soaking: taking the first %s readings, %s in."
+            return self._report(eventtime, "Soaking: taking the first %s readings, %s elapsed."
                                 % (self._label(self.soaker_name),
                                    self._elapsed_text(self.elapsed)))
         self.flat_time = self.flat_time + self.check_interval if abs(self.slope) <= self.flat_rate else 0.
@@ -220,7 +220,7 @@ class HeatSoak:
                      and (self.soak_floor <= 0. or self.soak_temp >= self.soak_floor))
         below_target = self.min_soak_temp > 0. and self.soak_temp < self.min_soak_temp
         if self.slope > self.target_rate or (below_target and not plateaued):
-            return self._report(eventtime, "Soaking: %s at %.0f °C, %+.1f °C/min. %s in, up to %s left."
+            return self._report(eventtime, "Soaking: %s at %.0f °C, %+.1f °C/min. %s elapsed, %s left."
                                 % (self._label(self.soaker_name), self.soak_temp, self.slope,
                                    self._elapsed_text(self.elapsed),
                                    self._elapsed_text(self.timeout - self.elapsed)))
