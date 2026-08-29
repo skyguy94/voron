@@ -15,9 +15,8 @@ OrcaSlicer/.orcaslicer_machine_id
 OrcaSlicer.conf
 OrcaSlicer.conf.bak
 database/**
+__pycache__/**
 
-# Private key material never goes in the repo. Only the CA certificate is
-# tracked, which is all a clone needs in order to trust a printer.
 *.key
 *.pem
 *.pfx

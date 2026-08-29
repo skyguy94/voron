@@ -1,0 +1,8 @@
+[Unit]
+Description=Re-announce this host to the router when its DNS entry is missing
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/skyguy94/voron/scripts/dhcp-reannounce.py
