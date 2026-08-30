@@ -151,7 +151,7 @@
 		"0"
 	],
 	"machine_pause_gcode": "PAUSE",
-	"machine_start_gcode": "MMU ENABLE=0\n\nPRINT_WARMUP BED=[first_layer_bed_temperature[initial_tool]] EXTRUDER=[first_layer_temperature[initial_tool]]\n\nSTART_HEAT_SOAK BED=[first_layer_bed_temperature[initial_tool]] CHAMBER_MIN=[chamber_minimal_temperature[initial_tool]] CHAMBER=[chamber_temperature[initial_tool]] EXTRUDER_IDLE=[idle_temperature[initial_tool]] \n\nPRINT_START BED=[first_layer_bed_temperature[initial_tool]] EXTRUDER=[first_layer_temperature[initial_tool]] EXTRUDER_IDLE=[idle_temperature[initial_tool]] \n\nLINE_PURGE",
+	"machine_start_gcode": "MMU ENABLE=0\n\nPRINT_WARMUP BED=[first_layer_bed_temperature[initial_tool]] EXTRUDER=[first_layer_temperature[initial_tool]]\n\nSTART_HEAT_SOAK BED=[first_layer_bed_temperature[initial_tool]] CHAMBER_MIN=[chamber_minimal_temperature[initial_tool]] CHAMBER=[chamber_temperature[initial_tool]] EXTRUDER_IDLE=[idle_temperature[initial_tool]] \n\nPRINT_START BED=[first_layer_bed_temperature[initial_tool]] EXTRUDER=[first_layer_temperature[initial_tool]] EXTRUDER_IDLE=[idle_temperature[initial_tool]] EXTRUDER_SOFTEN={first_layer_temperature[initial_tool] - 50}\n\nLINE_PURGE",
 	"machine_tool_change_time": "0",
 	"machine_unload_filament_time": "0",
 	"manual_filament_change": "0",
