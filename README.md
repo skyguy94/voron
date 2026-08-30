@@ -1,8 +1,8 @@
 # Voron & OrcaSlicer Configurations
 
 This repo contains my OrcaSlicer
-Printer configuration for VT.1399 (Voron Trident 300) and dv_027 (Doron Velta),
-plus the OrcaSlicer profiles that drive them.
+Printer configuration for VT.1399 (Voron Trident 300), v24_xxxx (Voron 2.4 350)
+and dv_027 (Doron Velta), plus the OrcaSlicer profiles that drive them.
 
 ## Klipper config
 
