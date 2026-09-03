@@ -154,14 +154,8 @@ class HeatSoak:
             gcmd.respond_info("No heat soak is running.")
             return
         phase = "warming up" if self.stage == 'heating' else "soaking"
-        heater = self.heater_name
         self.stop()
-        if heater:
-            target = self._heater_status(heater).get('target', 0.)
-            gcmd.respond_info("Heat soak stopped while %s. The %s is still set to %.0f °C."
-                              % (phase, self._label(heater), target))
-        else:
-            gcmd.respond_info("Heat soak stopped while %s." % (phase,))
+        gcmd.respond_info("Heat soak stopped while %s." % (phase,))
 
     def cmd_CANCEL_HEAT_SOAK(self, gcmd):
         if self.stage in ('heating', 'soaking'):
