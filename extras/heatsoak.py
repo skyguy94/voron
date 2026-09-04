@@ -214,10 +214,11 @@ class HeatSoak:
                      and (self.soak_floor <= 0. or self.soak_temp >= self.soak_floor))
         below_target = self.min_soak_temp > 0. and self.soak_temp < self.min_soak_temp
         if self.slope > self.target_rate or (below_target and not plateaued):
-            return self._report(eventtime, "Soaking: %s at %.0f °C, %+.1f °C/min. %s elapsed, %s left."
-                                % (self._label(self.soaker_name), self.soak_temp, self.slope,
-                                   self._elapsed_text(self.elapsed),
-                                   self._elapsed_text(self.timeout - self.elapsed)))
+            temp_text = ("%.0f of %.0f °C" % (self.soak_temp, self.min_soak_temp)
+                         if self.min_soak_temp > 0. else "%.0f °C" % (self.soak_temp,))
+            return self._report(eventtime, "Soaking: %s at %s, %+.1f °C/min. %s elapsed."
+                                % (self._label(self.soaker_name), temp_text, self.slope,
+                                   self._elapsed_text(self.elapsed)))
         if below_target:
             self._respond("The %s levelled off at %.0f °C after %s, short of %.0f °C. Moving on."
                           % (self._label(self.soaker_name), self.soak_temp,
