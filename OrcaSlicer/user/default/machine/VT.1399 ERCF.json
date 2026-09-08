@@ -174,7 +174,7 @@
 	"nozzle_height": "2.5",
 	"nozzle_hrc": "0",
 	"nozzle_type": [
-		"brass"
+		"hardened_steel"
 	],
 	"nozzle_volume": [
 		"0"
