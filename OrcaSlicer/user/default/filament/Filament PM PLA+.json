@@ -30,16 +30,16 @@
 		"0"
 	],
 	"chamber_minimal_temperature": [
-		"60"
+		"0"
 	],
 	"chamber_temperature": [
-		"65"
+		"0"
 	],
 	"close_additional_fan_first_x_layers": [
 		"1"
 	],
 	"close_fan_the_first_x_layers": [
-		"4"
+		"1"
 	],
 	"compatible_printers": [
 		"VT.1399 ERCF",
@@ -49,13 +49,13 @@
 	"compatible_prints": [],
 	"compatible_prints_condition": "",
 	"complete_print_exhaust_fan_speed": [
-		"80"
+		"70"
 	],
 	"cool_plate_temp": [
-		"110"
+		"60"
 	],
 	"cool_plate_temp_initial_layer": [
-		"110"
+		"60"
 	],
 	"default_filament_colour": [
 		""
@@ -64,7 +64,7 @@
 		"0"
 	],
 	"during_print_exhaust_fan_speed": [
-		"60"
+		"70"
 	],
 	"enable_overhang_bridge_fan": [
 		"1"
@@ -73,19 +73,19 @@
 		"0"
 	],
 	"eng_plate_temp": [
-		"110"
-	],
-	"eng_plate_temp_initial_layer": [
-		"110"
-	],
-	"fan_cooling_layer_time": [
 		"60"
 	],
+	"eng_plate_temp_initial_layer": [
+		"60"
+	],
+	"fan_cooling_layer_time": [
+		"100"
+	],
 	"fan_max_speed": [
-		"40"
+		"100"
 	],
 	"fan_min_speed": [
-		"40"
+		"100"
 	],
 	"filament_adaptive_volumetric_speed": [
 		"0"
@@ -112,10 +112,10 @@
 		"0"
 	],
 	"filament_cost": [
-		"0"
+		"20"
 	],
 	"filament_density": [
-		"1.12"
+		"1.24"
 	],
 	"filament_deretraction_speed": [
 		"nil"
@@ -124,13 +124,13 @@
 		"1.75"
 	],
 	"filament_end_gcode": [
-		" "
+		"; filament end gcode\n"
 	],
 	"filament_extruder_variant": [
 		"Direct Drive Standard"
 	],
 	"filament_flow_ratio": [
-		"0.95"
+		"0.98"
 	],
 	"filament_flush_temp": [
 		"0"
@@ -217,10 +217,10 @@
 		"nil"
 	],
 	"filament_settings_id": [
-		"Polymaker ABS (Metallic)"
+		"Filament PM PLA+"
 	],
 	"filament_shrink": [
-		"99%"
+		"100%"
 	],
 	"filament_shrinkage_compensation_z": [
 		"100%"
@@ -235,7 +235,7 @@
 		"0"
 	],
 	"filament_start_gcode": [
-		" "
+		"; Filament gcode\n"
 	],
 	"filament_toolchange_delay": [
 		"0"
@@ -256,7 +256,7 @@
 		"4"
 	],
 	"filament_type": [
-		"ABS"
+		"PLA"
 	],
 	"filament_unloading_speed": [
 		"0"
@@ -265,7 +265,7 @@
 		"0"
 	],
 	"filament_vendor": [
-		"Polymaker"
+		"Filament PM"
 	],
 	"filament_wipe": [
 		"nil"
@@ -287,13 +287,13 @@
 		"0"
 	],
 	"hot_plate_temp": [
-		"110"
+		"60"
 	],
 	"hot_plate_temp_initial_layer": [
-		"110"
+		"60"
 	],
 	"idle_temperature": [
-		"149"
+		"115"
 	],
 	"inherits": "",
 	"internal_bridge_fan_speed": [
@@ -305,24 +305,24 @@
 	"long_retractions_when_ec": [
 		"0"
 	],
-	"name": "Polymaker ABS (Metallic)",
+	"name": "Filament PM PLA+",
 	"nozzle_temperature": [
-		"255"
+		"205"
 	],
 	"nozzle_temperature_initial_layer": [
-		"255"
+		"205"
 	],
 	"nozzle_temperature_range_high": [
-		"265"
+		"220"
 	],
 	"nozzle_temperature_range_low": [
-		"245"
+		"190"
 	],
 	"overhang_fan_speed": [
 		"100"
 	],
 	"overhang_fan_threshold": [
-		"95%"
+		"50%"
 	],
 	"pellet_flow_coefficient": [
 		"0.4157"
@@ -331,10 +331,10 @@
 		"0.02"
 	],
 	"reduce_fan_stop_start_freq": [
-		"0"
+		"1"
 	],
 	"required_nozzle_HRC": [
-		"0"
+		"3"
 	],
 	"retraction_distances_when_ec": [
 		"10"
@@ -343,34 +343,34 @@
 		"1"
 	],
 	"slow_down_layer_time": [
-		"5"
+		"4"
 	],
 	"slow_down_min_speed": [
 		"10"
 	],
 	"supertack_plate_temp": [
-		"35"
+		"60"
 	],
 	"supertack_plate_temp_initial_layer": [
-		"35"
+		"60"
 	],
 	"support_material_interface_fan_speed": [
 		"-1"
 	],
 	"temperature_vitrification": [
-		"100"
+		"45"
 	],
 	"textured_cool_plate_temp": [
-		"110"
+		"60"
 	],
 	"textured_cool_plate_temp_initial_layer": [
-		"110"
+		"60"
 	],
 	"textured_plate_temp": [
-		"110"
+		"60"
 	],
 	"textured_plate_temp_initial_layer": [
-		"110"
+		"60"
 	],
 	"version": "2.2.0.0",
 	"volumetric_speed_coefficients": [

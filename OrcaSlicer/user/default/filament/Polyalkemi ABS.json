@@ -163,7 +163,7 @@
 		"nil"
 	],
 	"filament_max_volumetric_speed": [
-		"35"
+		"24"
 	],
 	"filament_minimal_purge_on_wipe_tower": [
 		"0"
@@ -217,7 +217,7 @@
 		"nil"
 	],
 	"filament_settings_id": [
-		"Polyalkami ABS"
+		"Polyalkemi ABS"
 	],
 	"filament_shrink": [
 		"100%"
@@ -265,7 +265,7 @@
 		"0"
 	],
 	"filament_vendor": [
-		"Polyalkami"
+		"Polyalkemi"
 	],
 	"filament_wipe": [
 		"nil"
@@ -305,7 +305,7 @@
 	"long_retractions_when_ec": [
 		"0"
 	],
-	"name": "Polyalkami ABS",
+	"name": "Polyalkemi ABS",
 	"nozzle_temperature": [
 		"255"
 	],
@@ -333,6 +333,7 @@
 	"reduce_fan_stop_start_freq": [
 		"1"
 	],
+	"renamed_from": "Polyalkami ABS",
 	"required_nozzle_HRC": [
 		"3"
 	],
