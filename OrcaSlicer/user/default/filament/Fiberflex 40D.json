@@ -181,7 +181,7 @@
         "0"
     ],
     "filament_start_gcode": [
-        " "
+        "SET_GCODE_OFFSET Z=0.05"
     ],
     "filament_toolchange_delay": [
         "0"
@@ -215,10 +215,10 @@
         "0"
     ],
     "hot_plate_temp": [
-        "50"
+        "55"
     ],
     "hot_plate_temp_initial_layer": [
-        "50"
+        "55"
     ],
     "idle_temperature": [
         "149"
@@ -287,10 +287,10 @@
         "30"
     ],
     "textured_plate_temp": [
-        "50"
+        "55"
     ],
     "textured_plate_temp_initial_layer": [
-        "50"
+        "55"
     ],
     "version": "2.2.0.0"
 }
