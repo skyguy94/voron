@@ -1,0 +1,221 @@
+diff --git a/mobileraker/data/dtos/moonraker/printer_snapshot.py b/mobileraker/data/dtos/moonraker/printer_snapshot.py
+--- a/mobileraker/data/dtos/moonraker/printer_snapshot.py
++++ b/mobileraker/data/dtos/moonraker/printer_snapshot.py
+@@ -25,13 +25,12 @@
+         self.gcode_move: Optional[GCodeMove] = None
+         self.gcode_response: Optional[str] = None
+         self.gcode_response_hash: Optional[str] = None
+-        self.timelapse_pause: Optional[bool] = None
+         self.suppressed_state: Optional[str] = None
+         self.filament_sensors: Dict[str, FilamentSensor] = {}
+ 
+     def __str__(self):
+         filament_sensors_str = ', '.join(str(v) for v in self.filament_sensors.values())
+-        return f"PrinterSnapshot(timestamp={self.timestamp.isoformat()},klippy_ready={self.klippy_ready}, print_state={self.print_state}, m117={self.m117}, m117_hash={self.m117_hash}, virtual_sdcard={self.virtual_sdcard}, print_stats={self.print_stats}, current_file={self.current_file}, toolhead={self.toolhead}, gcode_move={self.gcode_move}, gcode_response={self.gcode_response}, gcode_response_hash={self.gcode_response_hash}, timelapse_pause={self.timelapse_pause}, filament_sensors={filament_sensors_str})"
++        return f"PrinterSnapshot(timestamp={self.timestamp.isoformat()},klippy_ready={self.klippy_ready}, print_state={self.print_state}, m117={self.m117}, m117_hash={self.m117_hash}, virtual_sdcard={self.virtual_sdcard}, print_stats={self.print_stats}, current_file={self.current_file}, toolhead={self.toolhead}, gcode_move={self.gcode_move}, gcode_response={self.gcode_response}, gcode_response_hash={self.gcode_response_hash}, suppressed_state={self.suppressed_state}, filament_sensors={filament_sensors_str})"
+ 
+     def __eq__(self, other):
+         if not isinstance(other, PrinterSnapshot):
+@@ -46,7 +45,7 @@
+             and self.virtual_sdcard == other.virtual_sdcard
+             and self.current_file == other.current_file
+             and self.gcode_response == other.gcode_response
+-            and self.timelapse_pause == other.timelapse_pause
++            and self.suppressed_state == other.suppressed_state
+             and self.filament_sensors == other.filament_sensors
+         )
+ 
+@@ -227,13 +226,7 @@
+         return int(self.print_progress_by_fileposition_relative * 100) if self.print_progress_by_fileposition_relative else None
+     
+     @property
+-    def is_timelapse_pause(self) -> bool:
+-        return self.print_state == "paused" and self.timelapse_pause is True
+-
+-    @property
+     def is_suppressed_state(self) -> bool:
+-        if self.is_timelapse_pause:
+-            return True
+         if not self.klippy_ready:
+             return False
+         return self.suppressed_state is not None and self.print_state == self.suppressed_state
+diff --git a/mobileraker/service/data_sync_service.py b/mobileraker/service/data_sync_service.py
+--- a/mobileraker/service/data_sync_service.py
++++ b/mobileraker/service/data_sync_service.py
+@@ -53,7 +53,6 @@
+         self._logger: logging.Logger = logging.getLogger(f'mobileraker.{printer_name}.sync')
+         self._queried_for_session: bool = False
+         self._objects: Dict[str, Any] = {}
+-        self._reset_timelapse_pause: Optional[bool] = None # Helper to reset the timelapse_pause attribute after the printer switched back from paused to printing
+         self.klippy_ready: bool = False
+         self.server_info: ServerInfo = ServerInfo()
+         self.print_stats: PrintStats = PrintStats()
+@@ -63,7 +62,6 @@
+         self.virtual_sdcard: VirtualSDCard = VirtualSDCard()
+         self.current_file: Optional[GCodeFile] = None
+         self.gcode_response: Optional[str] = None
+-        self.timelapse_pause: Optional[bool] = None
+         self.suppressed_state: Optional[str] = None
+         self._suppress_expiry: Optional[float] = None
+         self._suppress_entered: bool = False
+@@ -108,12 +106,6 @@
+ 
+             if object_identifier == 'print_stats':
+                 self.print_stats = self.print_stats.updateWith(object_data)
+-            
+-                # If the state is printing and _reset_timelapse_pause is True, we reset the timelapse_pause attribute
+-                if self.print_stats.state != 'paused' and self._reset_timelapse_pause:
+-                    self.timelapse_pause = False
+-                    self._reset_timelapse_pause = False
+-                    self._logger.info("Printer has unpaused after Timelapse plugin took frame. Resetting timelapse_pause attribute.")
+ 
+                 # When the print_stats object is updated, we need to fetch the metadata for the current file
+                 fetchMeta = True
+@@ -137,18 +129,11 @@
+                 self.filament_sensors[object_name] = sensor.updateWith(object_data)
+ 
+             elif rawObjectKey == 'gcode_macro TIMELAPSE_TAKE_FRAME':
+-                if 'is_paused' in object_data:
+-                    is_paused = object_data['is_paused']
+-                    if is_paused is True:
+-                        self.timelapse_pause = True
+-                        self._reset_timelapse_pause = False
+-                        self._logger.info("Timelapse plugin has paused the printer. Ignoring the next paused printer state.")
+-                    elif is_paused is False and self._reset_timelapse_pause is False:
+-                        # We need to use a helper attribute to reset the timelapse_pause attribute after the printer switched back from paused to printing
+-                        # This is because the printer state is not (always) updated in the same jrpc notification as the gcode_macro TIMELAPSE_TAKE_FRAME
+-                        # Which causes a race condition where the timelapse_pause attribute is reset before the printer state is updated.
+-                        self._reset_timelapse_pause = True
+-                        self._logger.info("Timelapse plugin took frame. Will reset timelapse_pause attribute after printer-state change.")
++                if object_data.get('is_paused') is True:
++                    self.suppressed_state = 'paused'
++                    self._suppress_expiry = None
++                    self._suppress_entered = False
++                    self._logger.info("Timelapse plugin announced a paused state.")
+                 
+ 
+         # Kinda hacky but this works!
+@@ -416,7 +401,6 @@
+             self.virtual_sdcard: VirtualSDCard = VirtualSDCard()
+             self.current_file: Optional[GCodeFile] = None
+             self.gcode_response: Optional[str] = None
+-            self.timelapse_pause: Optional[bool] = None
+             self.filament_sensors: Dict[str, FilamentSensor] = {}
+ 
+             await self._resync()
+@@ -484,7 +468,6 @@
+         snapshot.gcode_response = self.gcode_response
+         snapshot.gcode_response_hash = hashlib.sha256(snapshot.gcode_response.encode(
+             "utf-8")).hexdigest() if snapshot.gcode_response else ''
+-        snapshot.timelapse_pause = self.timelapse_pause
+         snapshot.suppressed_state = self._resolve_suppressed_state(snapshot.print_state)
+         snapshot.filament_sensors = dict(self.filament_sensors)
+ 
+diff --git a/tests/data_sync_client_test.py b/tests/data_sync_client_test.py
+--- a/tests/data_sync_client_test.py
++++ b/tests/data_sync_client_test.py
+@@ -234,6 +234,28 @@
+         self.assertIsNone(resumed.suppressed_state)
+         self.assertIsNone(self.data_sync_service.suppressed_state)
+ 
++    def test_timelapse_frame_arms_the_same_announcement(self):
++        """The timelapse plugin now routes through the general mechanism."""
++        self.data_sync_service._parse_objects(
++            {"gcode_macro TIMELAPSE_TAKE_FRAME": {"is_paused": True}})
++
++        self.assertEqual(self.data_sync_service.suppressed_state, "paused")
++
++    def test_timelapse_announcement_clears_when_the_pause_ends(self):
++        """No reset bookkeeping is needed, the state ending is enough."""
++        self.data_sync_service.klippy_ready = True
++        self.data_sync_service._parse_objects(
++            {"gcode_macro TIMELAPSE_TAKE_FRAME": {"is_paused": True}})
++        self.data_sync_service.print_stats = self.data_sync_service.print_stats.updateWith(
++            {"state": "paused"})
++        self.data_sync_service.take_snapshot()
++
++        self.data_sync_service.print_stats = self.data_sync_service.print_stats.updateWith(
++            {"state": "printing"})
++        resumed = self.data_sync_service.take_snapshot()
++
++        self.assertIsNone(resumed.suppressed_state)
++
+     def test_clear_disarms_the_announcement(self):
+         """The printer can withdraw an announcement it no longer needs."""
+         self.data_sync_service._on_gcode_response("// MR_NOTIFY_SKIP: error")
+diff --git a/tests/test_notification_evaluator.py b/tests/test_notification_evaluator.py
+--- a/tests/test_notification_evaluator.py
++++ b/tests/test_notification_evaluator.py
+@@ -98,7 +98,6 @@
+         snapshot.m117_hash = str(hash(m117)) if m117 else ""
+         snapshot.gcode_response = gcode_response
+         snapshot.gcode_response_hash = str(hash(gcode_response)) if gcode_response else None
+-        snapshot.timelapse_pause = False
+         snapshot.filament_sensors = filament_sensors or {}
+         
+         return snapshot
+@@ -137,12 +136,12 @@
+         self.assertIsNone(result)
+ 
+     def test_evaluate_state_notification_timelapse_pause(self):
+-        """Test state notification ignores timelapse pauses."""
++        """Test state notification ignores the pause the timelapse plugin causes."""
+         timelapse_snapshot = self._create_test_snapshot(print_state="paused")
+-        timelapse_snapshot.timelapse_pause = True
+-        
++        timelapse_snapshot.suppressed_state = "paused"
++
+         result = self.evaluator.evaluate_state_notification(self.device_cfg, timelapse_snapshot)
+-        
++
+         self.assertIsNone(result)
+ 
+     def test_evaluate_state_notification_suppressed_state(self):
+@@ -155,28 +154,6 @@
+         self.assertIsNone(result)
+ 
+     @patch('mobileraker.service.notification_evaluator.translate_replace_placeholders')
+-    def test_notify_skip_matches_the_timelapse_special_case(self, mock_translate):
+-        """The generic mechanism reaches the same verdict as the hardcoded timelapse one."""
+-        mock_translate.side_effect = lambda key, *args, **kwargs: f"translated_{key}"
+-
+-        control = self._create_test_snapshot(print_state="paused")
+-        timelapse = self._create_test_snapshot(print_state="paused")
+-        timelapse.timelapse_pause = True
+-        generic = self._create_test_snapshot(print_state="paused")
+-        generic.suppressed_state = "paused"
+-
+-        self.device_cfg.snap.state = "printing"
+-        unsuppressed = self.evaluator.evaluate_state_notification(self.device_cfg, control)
+-        self.device_cfg.snap.state = "printing"
+-        by_timelapse = self.evaluator.evaluate_state_notification(self.device_cfg, timelapse)
+-        self.device_cfg.snap.state = "printing"
+-        by_notify_skip = self.evaluator.evaluate_state_notification(self.device_cfg, generic)
+-
+-        self.assertIsInstance(unsuppressed, NotificationContentDto)
+-        self.assertIsNone(by_timelapse)
+-        self.assertIsNone(by_notify_skip)
+-
+-    @patch('mobileraker.service.notification_evaluator.translate_replace_placeholders')
+     def test_evaluate_state_notification_suppression_is_state_specific(self, mock_translate):
+         """Test a suppression for one state does not silence a different one."""
+         mock_translate.side_effect = lambda key, *args, **kwargs: f"translated_{key}"
+diff --git a/tests/test_mobileraker_companion_integration.py b/tests/test_mobileraker_companion_integration.py
+--- a/tests/test_mobileraker_companion_integration.py
++++ b/tests/test_mobileraker_companion_integration.py
+@@ -80,7 +80,6 @@
+         snapshot.m117_hash = str(hash(m117)) if m117 else ""
+         snapshot.gcode_response = gcode_response
+         snapshot.gcode_response_hash = str(hash(gcode_response)) if gcode_response else None
+-        snapshot.timelapse_pause = False
+         snapshot.filament_sensors = filament_sensors or {}
+         
+         return snapshot
+@@ -403,7 +402,6 @@
+         snapshot.m117_hash = ""
+         snapshot.gcode_response = None
+         snapshot.gcode_response_hash = ""
+-        snapshot.timelapse_pause = False
+         snapshot.filament_sensors = {}
+         return snapshot
+ 

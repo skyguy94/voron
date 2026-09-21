@@ -1,0 +1,28 @@
+feat(notification): let the printer suppress an expected state change
+
+Pause notifications are all-or-nothing per state. A printer that pauses
+itself as part of normal operation, a heat soak before the first layer, a
+filament change, a tool change, raises an alert indistinguishable from a
+real fault. The only way to stop it today is to disable paused
+notifications entirely, which also loses the alerts that matter.
+
+The companion already had an escape hatch for exactly this case, but
+hardcoded to one plugin through the gcode_macro TIMELAPSE_TAKE_FRAME
+object. This generalises it. The printer sends
+
+    MR_NOTIFY_SKIP: <state> [ttl_seconds]
+
+on the existing gcode response channel, alongside MR_NOTIFY:, to declare
+that a state change it is about to cause is expected.
+
+The ttl covers the gap between the message and the state change, not the
+duration of the state itself, so a short default is correct even for a
+long pause. Being one-shot and self-expiring it cannot leave
+notifications permanently muted, which a sticky flag can do if a print
+errors between setting and clearing it.
+
+Existing behaviour is preserved: is_suppressed_state subsumes
+is_timelapse_pause, so moonraker-timelapse users are unaffected and the
+special case can be retired later by having timelapse emit MR_NOTIFY_SKIP.
+
+Refs Clon1998/mobileraker#71

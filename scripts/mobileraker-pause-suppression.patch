@@ -1,0 +1,370 @@
+diff --git a/mobileraker/data/dtos/moonraker/printer_snapshot.py b/mobileraker/data/dtos/moonraker/printer_snapshot.py
+index 62865d6..4f231a8 100644
+--- a/mobileraker/data/dtos/moonraker/printer_snapshot.py
++++ b/mobileraker/data/dtos/moonraker/printer_snapshot.py
+@@ -26,6 +26,7 @@ class PrinterSnapshot:
+         self.gcode_response: Optional[str] = None
+         self.gcode_response_hash: Optional[str] = None
+         self.timelapse_pause: Optional[bool] = None
++        self.suppressed_state: Optional[str] = None
+         self.filament_sensors: Dict[str, FilamentSensor] = {}
+ 
+     def __str__(self):
+@@ -228,6 +229,14 @@ class PrinterSnapshot:
+     @property
+     def is_timelapse_pause(self) -> bool:
+         return self.print_state == "paused" and self.timelapse_pause is True
++
++    @property
++    def is_suppressed_state(self) -> bool:
++        if self.is_timelapse_pause:
++            return True
++        if not self.klippy_ready:
++            return False
++        return self.suppressed_state is not None and self.print_state == self.suppressed_state
+     
+     
+     @property
+diff --git a/mobileraker/mobileraker_companion.py b/mobileraker/mobileraker_companion.py
+index 5fabac1..c3237be 100644
+--- a/mobileraker/mobileraker_companion.py
++++ b/mobileraker/mobileraker_companion.py
+@@ -226,7 +226,7 @@ class MobilerakerCompanion:
+             self._logger.info('No last snapshot available. Evaluating!')
+             return True
+ 
+-        if self._last_snapshot.print_state != snapshot.print_state and not snapshot.is_timelapse_pause:
++        if self._last_snapshot.print_state != snapshot.print_state and not snapshot.is_suppressed_state:
+             self._logger.info('State changed. Evaluating!')
+             return True
+ 
+@@ -390,7 +390,7 @@ class MobilerakerCompanion:
+             now = datetime.now()
+             
+             updated = last.copy_with(
+-                state=printer_snap.print_state if last.state != printer_snap.print_state and not printer_snap.is_timelapse_pause else None,
++                state=printer_snap.print_state if last.state != printer_snap.print_state and not printer_snap.is_suppressed_state else None,
+                 progress=progress_update,
+                 progress_live_activity=progress_live_activity_update,
+                 progress_progressbar=progressbar_update,
+diff --git a/mobileraker/service/data_sync_service.py b/mobileraker/service/data_sync_service.py
+index 1852099..22290cd 100644
+--- a/mobileraker/service/data_sync_service.py
++++ b/mobileraker/service/data_sync_service.py
+@@ -2,6 +2,7 @@ from asyncio import AbstractEventLoop, sleep
+ import asyncio
+ import hashlib
+ import logging
++import time
+ from typing import Any, Callable, Dict, List, Optional
+ from mobileraker.client.moonraker_client import MoonrakerClient
+ from mobileraker.data.dtos.moonraker.printer_objects import DisplayStatus, FilamentSensor, GCodeFile, GCodeMove, PrintStats, ServerInfo, Toolhead, VirtualSDCard
+@@ -63,6 +64,9 @@ class DataSyncService:
+         self.current_file: Optional[GCodeFile] = None
+         self.gcode_response: Optional[str] = None
+         self.timelapse_pause: Optional[bool] = None
++        self.suppressed_state: Optional[str] = None
++        self._suppress_expiry: Optional[float] = None
++        self._suppress_entered: bool = False
+         self.filament_sensors: Dict[str, FilamentSensor] = {}
+         self.resync_retries: int = resync_retries
+         
+@@ -199,11 +203,64 @@ class DataSyncService:
+         # strip "// " from response as it is always part of the Gcode Response (https://www.klipper3d.org/Command_Templates.html?h=action_respond_info#actions)
+         response = response[3:]
+ 
++        notify_skip_prefix = 'MR_NOTIFY_SKIP:'
++        if response.startswith(notify_skip_prefix):
++            self._parse_notify_skip_request(response[len(notify_skip_prefix):])
++            self._notify_listeners()
++            return
++
+         self._logger.debug(
+             "Received an Gcode Response from Klippy: %s", response)
+         self.gcode_response = response
+         self._notify_listeners()
+ 
++    def _parse_notify_skip_request(self, payload: str) -> None:
++        '''
++        Handle a MR_NOTIFY_SKIP request from the printer.
++
++        The ttl covers the gap between this message and the state change it
++        announces, not how long that state lasts, so a short value is correct
++        even for a long pause.
++
++        Returns:
++            None
++        '''
++        max_ttl = 900.0
++
++        parts = payload.split()
++        if not parts:
++            self._logger.warning("Received a notification-skip request without a state. Ignoring...")
++            return
++
++        if parts[0].strip().lower() == 'clear':
++            self._logger.info("Printer cleared its '%s' announcement.", self.suppressed_state)
++            self._clear_notify_skip()
++            return
++
++        state = parts[0].strip().lower()
++        expiry = None
++        if len(parts) > 1:
++            try:
++                expiry = time.monotonic() + max(0.0, min(float(parts[1]), max_ttl))
++            except ValueError:
++                self._logger.warning("Could not parse ttl %r, announcement will not expire", parts[1])
++        self.suppressed_state = state
++        self._suppress_expiry = expiry
++        self._suppress_entered = False
++        self._logger.info("Printer announced a '%s' state%s.", state,
++                          " within %.0fs" % (expiry - time.monotonic()) if expiry else "")
++
++    def _clear_notify_skip(self) -> None:
++        '''
++        Drop any announcement the printer has made.
++
++        Returns:
++            None
++        '''
++        self.suppressed_state = None
++        self._suppress_expiry = None
++        self._suppress_entered = False
++
+     def _on_jrpc_connection_state(self, is_connected: bool):
+         self._logger.info("Connection state changed to <is_connected: %s>", is_connected)
+         if is_connected:
+@@ -380,6 +437,30 @@ class DataSyncService:
+         except asyncio.CancelledError:
+             self._logger.info("Resync task was cancelled")
+ 
++    def _resolve_suppressed_state(self, print_state: Optional[str]) -> Optional[str]:
++        '''
++        Resolve whether the announced state is still being suppressed.
++
++        An announcement holds until the state it names has come and gone, or
++        until the printer clears it. A ttl is optional and only bounds how long
++        it waits for that state to arrive.
++
++        Returns:
++            Optional[str]: The suppressed state, or None.
++        '''
++        if self.suppressed_state is None:
++            return None
++        if print_state == self.suppressed_state:
++            self._suppress_entered = True
++            return self.suppressed_state
++        if self._suppress_entered:
++            self._clear_notify_skip()
++            return None
++        if self._suppress_expiry is not None and time.monotonic() >= self._suppress_expiry:
++            self._clear_notify_skip()
++            return None
++        return self.suppressed_state
++
+     def take_snapshot(self) -> PrinterSnapshot:
+         '''
+         Take a snapshot of the current printer data.
+@@ -404,6 +485,7 @@ class DataSyncService:
+         snapshot.gcode_response_hash = hashlib.sha256(snapshot.gcode_response.encode(
+             "utf-8")).hexdigest() if snapshot.gcode_response else ''
+         snapshot.timelapse_pause = self.timelapse_pause
++        snapshot.suppressed_state = self._resolve_suppressed_state(snapshot.print_state)
+         snapshot.filament_sensors = dict(self.filament_sensors)
+ 
+         self._logger.debug('Took a PrinterSnapshot: %s', snapshot)
+diff --git a/mobileraker/service/notification_evaluator.py b/mobileraker/service/notification_evaluator.py
+index 5fe4193..4c540b1 100644
+--- a/mobileraker/service/notification_evaluator.py
++++ b/mobileraker/service/notification_evaluator.py
+@@ -113,8 +113,8 @@ class NotificationEvaluator:
+         if cur_snap.print_state not in cfg.settings.state_config:
+             return None
+                 
+-        # Ignore paused state caused by timelapse plugin
+-        if cur_snap.is_timelapse_pause:
++        # Ignore a state change the printer announced in advance
++        if cur_snap.is_suppressed_state:
+             return None
+ 
+         # Collect title and body to translate it
+diff --git a/tests/data_sync_client_test.py b/tests/data_sync_client_test.py
+index 94756ce..3ee53c1 100644
+--- a/tests/data_sync_client_test.py
++++ b/tests/data_sync_client_test.py
+@@ -156,6 +156,120 @@ class TestDataSyncService(unittest.TestCase):
+         self.assertEqual(len(received_a), 1)
+         self.assertEqual(len(received_b), 1)
+ 
++    # ------------------------------------------------------------------
++    # Notification skip requests
++    # ------------------------------------------------------------------
++
++    def test_on_gcode_response_records_suppression(self):
++        """A MR_NOTIFY_SKIP response arms suppression for the named state."""
++        self.data_sync_service._on_gcode_response("// MR_NOTIFY_SKIP: paused 30")
++
++        self.assertEqual(self.data_sync_service.suppressed_state, "paused")
++        self.assertIsNotNone(self.data_sync_service._suppress_expiry)
++
++    def test_suppression_request_is_not_stored_as_gcode_response(self):
++        """A MR_NOTIFY_SKIP response is consumed, not surfaced as a custom notification."""
++        self.data_sync_service._on_gcode_response("// MR_NOTIFY_SKIP: paused 30")
++
++        self.assertIsNone(self.data_sync_service.gcode_response)
++
++    def test_announcement_without_ttl_does_not_expire(self):
++        """Without a ttl the announcement waits indefinitely for its state."""
++        self.data_sync_service._on_gcode_response("// MR_NOTIFY_SKIP: paused")
++
++        self.assertEqual(self.data_sync_service.suppressed_state, "paused")
++        self.assertIsNone(self.data_sync_service._suppress_expiry)
++
++    def test_suppression_without_a_state_is_ignored(self):
++        """A malformed request leaves suppression disarmed."""
++        self.data_sync_service._on_gcode_response("// MR_NOTIFY_SKIP:")
++
++        self.assertIsNone(self.data_sync_service.suppressed_state)
++
++    def test_suppression_appears_in_snapshot(self):
++        """An armed suppression is carried on the snapshot."""
++        self.data_sync_service.klippy_ready = True
++        self.data_sync_service._on_gcode_response("// MR_NOTIFY_SKIP: paused 30")
++
++        snap = self.data_sync_service.take_snapshot()
++
++        self.assertEqual(snap.suppressed_state, "paused")
++        self.assertTrue(snap.is_suppressed_state or snap.print_state != "paused")
++
++    def test_expired_suppression_is_absent_from_snapshot(self):
++        """A suppression that has run out of ttl is not applied."""
++        self.data_sync_service.klippy_ready = True
++        self.data_sync_service._on_gcode_response("// MR_NOTIFY_SKIP: paused 0")
++
++        snap = self.data_sync_service.take_snapshot()
++
++        self.assertIsNone(snap.suppressed_state)
++
++    def test_suppression_holds_after_ttl_once_the_state_is_entered(self):
++        """A long pause stays suppressed even after the arming ttl has passed."""
++        self.data_sync_service.klippy_ready = True
++        self.data_sync_service.print_stats = self.data_sync_service.print_stats.updateWith(
++            {"state": "paused"})
++        self.data_sync_service._on_gcode_response("// MR_NOTIFY_SKIP: paused 60")
++
++        entered = self.data_sync_service.take_snapshot()
++        self.data_sync_service._suppress_expiry = 0.0
++        much_later = self.data_sync_service.take_snapshot()
++
++        self.assertEqual(entered.suppressed_state, "paused")
++        self.assertEqual(much_later.suppressed_state, "paused")
++
++    def test_suppression_clears_once_the_state_ends(self):
++        """Leaving the announced state disarms the suppression."""
++        self.data_sync_service.klippy_ready = True
++        self.data_sync_service.print_stats = self.data_sync_service.print_stats.updateWith(
++            {"state": "paused"})
++        self.data_sync_service._on_gcode_response("// MR_NOTIFY_SKIP: paused 60")
++        self.data_sync_service.take_snapshot()
++
++        self.data_sync_service.print_stats = self.data_sync_service.print_stats.updateWith(
++            {"state": "printing"})
++        resumed = self.data_sync_service.take_snapshot()
++
++        self.assertIsNone(resumed.suppressed_state)
++        self.assertIsNone(self.data_sync_service.suppressed_state)
++
++    def test_clear_disarms_the_announcement(self):
++        """The printer can withdraw an announcement it no longer needs."""
++        self.data_sync_service._on_gcode_response("// MR_NOTIFY_SKIP: error")
++        self.data_sync_service._on_gcode_response("// MR_NOTIFY_SKIP: clear error")
++
++        self.assertIsNone(self.data_sync_service.suppressed_state)
++
++    def test_unexpired_announcement_survives_until_cleared(self):
++        """An announcement with no ttl stays armed across snapshots."""
++        self.data_sync_service.klippy_ready = True
++        self.data_sync_service.print_stats = self.data_sync_service.print_stats.updateWith(
++            {"state": "printing"})
++        self.data_sync_service._on_gcode_response("// MR_NOTIFY_SKIP: error")
++
++        self.data_sync_service.take_snapshot()
++        still_armed = self.data_sync_service.take_snapshot()
++
++        self.assertEqual(still_armed.suppressed_state, "error")
++
++    def test_suppression_never_applies_when_klippy_is_down(self):
++        """A dead printer reports an error even with an error announcement armed."""
++        self.data_sync_service.klippy_ready = False
++        self.data_sync_service._on_gcode_response("// MR_NOTIFY_SKIP: error")
++
++        snap = self.data_sync_service.take_snapshot()
++
++        self.assertEqual(snap.print_state, "error")
++        self.assertFalse(snap.is_suppressed_state)
++
++    def test_normal_gcode_response_is_unaffected(self):
++        """Responses without the prefix are stored as before."""
++        self.data_sync_service._on_gcode_response("// echo: hello")
++
++        self.assertEqual(self.data_sync_service.gcode_response, "echo: hello")
++        self.assertIsNone(self.data_sync_service.suppressed_state)
++
+     # ------------------------------------------------------------------
+     # Klippy event handlers
+     # ------------------------------------------------------------------
+diff --git a/tests/test_notification_evaluator.py b/tests/test_notification_evaluator.py
+index 25edc51..2f29043 100644
+--- a/tests/test_notification_evaluator.py
++++ b/tests/test_notification_evaluator.py
+@@ -145,6 +145,50 @@ class TestNotificationEvaluator(unittest.TestCase):
+         
+         self.assertIsNone(result)
+ 
++    def test_evaluate_state_notification_suppressed_state(self):
++        """Test state notification ignores a state the printer declared expected."""
++        suppressed_snapshot = self._create_test_snapshot(print_state="paused")
++        suppressed_snapshot.suppressed_state = "paused"
++
++        result = self.evaluator.evaluate_state_notification(self.device_cfg, suppressed_snapshot)
++
++        self.assertIsNone(result)
++
++    @patch('mobileraker.service.notification_evaluator.translate_replace_placeholders')
++    def test_notify_skip_matches_the_timelapse_special_case(self, mock_translate):
++        """The generic mechanism reaches the same verdict as the hardcoded timelapse one."""
++        mock_translate.side_effect = lambda key, *args, **kwargs: f"translated_{key}"
++
++        control = self._create_test_snapshot(print_state="paused")
++        timelapse = self._create_test_snapshot(print_state="paused")
++        timelapse.timelapse_pause = True
++        generic = self._create_test_snapshot(print_state="paused")
++        generic.suppressed_state = "paused"
++
++        self.device_cfg.snap.state = "printing"
++        unsuppressed = self.evaluator.evaluate_state_notification(self.device_cfg, control)
++        self.device_cfg.snap.state = "printing"
++        by_timelapse = self.evaluator.evaluate_state_notification(self.device_cfg, timelapse)
++        self.device_cfg.snap.state = "printing"
++        by_notify_skip = self.evaluator.evaluate_state_notification(self.device_cfg, generic)
++
++        self.assertIsInstance(unsuppressed, NotificationContentDto)
++        self.assertIsNone(by_timelapse)
++        self.assertIsNone(by_notify_skip)
++
++    @patch('mobileraker.service.notification_evaluator.translate_replace_placeholders')
++    def test_evaluate_state_notification_suppression_is_state_specific(self, mock_translate):
++        """Test a suppression for one state does not silence a different one."""
++        mock_translate.side_effect = lambda key, *args, **kwargs: f"translated_{key}"
++        self.device_cfg.snap.state = "printing"
++        suppressed_snapshot = self._create_test_snapshot(print_state="error")
++        suppressed_snapshot.suppressed_state = "paused"
++
++        result = self.evaluator.evaluate_state_notification(self.device_cfg, suppressed_snapshot)
++
++        self.assertIsInstance(result, NotificationContentDto)
++        self.assertEqual(result.body, "translated_state_error_body")
++
+     @patch('mobileraker.service.notification_evaluator.translate_replace_placeholders')
+     @patch('mobileraker.service.notification_evaluator.normalized_progress_interval_reached')
+     def test_evaluate_progress_notification_threshold_reached(self, mock_interval_reached, mock_translate):
