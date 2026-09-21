@@ -1,0 +1,155 @@
+{
+  "name": "vt_1399 Voron Trident 300",
+  "kinematics": "trident",
+  "bed_moves_in_z": true,
+  "bed_size": [
+    300,
+    307
+  ],
+  "z_limits": [
+    -0.9,
+    230
+  ],
+  "moonraker": "http://127.0.0.1:7125",
+  "snapshot_url": "http://127.0.0.1:8080/?action=snapshot",
+  "device": "/dev/video0",
+  "resolution": "1280x960",
+  "bed_roi": [
+    0.73,
+    1.0,
+    0.0,
+    1.0
+  ],
+  "parks": {
+    "fl": [
+      5.0,
+      5.0
+    ],
+    "fr": [
+      295.0,
+      5.0
+    ]
+  },
+  "default_park": "fl",
+  "sweep_heights": [
+    15,
+    20,
+    25,
+    30,
+    35,
+    40,
+    50,
+    60,
+    70
+  ],
+  "probe_heights": [
+    25,
+    45
+  ],
+  "exposure_ladder": [
+    1250,
+    2500,
+    5000,
+    7500
+  ],
+  "exposure_target": 55,
+  "exposure_calibration_z": 45,
+  "min_clearance": 40,
+  "camera_lock": {
+    "auto_exposure": 1,
+    "white_balance_automatic": 0,
+    "white_balance_temperature": 4000,
+    "power_line_frequency": 1,
+    "exposure_dynamic_framerate": 1,
+    "backlight_compensation": 1,
+    "gain": 24,
+    "brightness": 128,
+    "contrast": 32,
+    "saturation": 32,
+    "sharpness": 24
+  },
+  "camera_unlock": {
+    "auto_exposure": 3,
+    "white_balance_automatic": 1
+  },
+  "lights": {
+    "chamber": [
+      "SET_LED LED=chamber WHITE={level:.2f} SYNC=0 TRANSMIT=1"
+    ],
+    "nozzle": [
+      "SET_LED LED=sb_leds RED={level:.2f} GREEN={level:.2f} BLUE={level:.2f} INDEX=2 SYNC=0 TRANSMIT=0",
+      "SET_LED LED=sb_leds RED={level:.2f} GREEN={level:.2f} BLUE={level:.2f} INDEX=3 SYNC=0 TRANSMIT=1"
+    ]
+  },
+  "lights_restore": {
+    "chamber": 1.0
+  },
+  "pre_gcode": [
+    "STOP_LED_EFFECTS"
+  ],
+  "notes": "Bed moves in Z. Plate only visible below about Z70. Nozzle LEDs measured dead 2026-09-03. exclude_regions covers where plate-reseat error concentrates, refitted 2026-09-04; it blinds the check to an object sitting there, 7.5%% of the roi. Operating point z020-z025. camera_lock pins every control 2026-09-04: gain was the drift source, auto raises it silently and v4l2 reports a stale 8, so all pre-2026-09-04 manifests recording gain 8 are wrong about the gain actually used. With gain pinned the exposure caps out at 7500 and gain is the brightness knob. Five lock cycles now spread 0.22 grey levels against 6.14 before. power_line_frequency is 1 (50 Hz, Norway); it was 2 and that alone moved the roi mean 30%%. All references captured before this change are invalid as references.",
+  "exclude_regions": [
+    [
+      0.65,
+      0.9962,
+      0.2648,
+      0.3688
+    ],
+    [
+      0.5885,
+      0.9962,
+      0.1578,
+      0.2375
+    ],
+    [
+      0.2615,
+      0.3577,
+      0.9609,
+      0.9867
+    ],
+    [
+      0.45,
+      0.5077,
+      0.0453,
+      0.0695
+    ],
+    [
+      0.2885,
+      0.3423,
+      0.0445,
+      0.0688
+    ],
+    [
+      0.3692,
+      0.4269,
+      0.0453,
+      0.068
+    ]
+  ],
+  "blob_threshold": 20,
+  "gain_ladder": [
+    8,
+    16,
+    24,
+    32,
+    48
+  ],
+  "default_exposure": 7500,
+  "marking_regions": [
+    [
+      0.65,
+      0.9962,
+      0.2648,
+      0.3688
+    ],
+    [
+      0.5885,
+      0.9962,
+      0.1578,
+      0.2375
+    ]
+  ],
+  "check_z": 25,
+  "check_threshold": 200,
+  "check_marking_threshold": 0.5
+}

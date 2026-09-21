@@ -1,0 +1,44 @@
+{
+  "name": "v24_xxxx Voron 2.4 350",
+  "kinematics": "v2.4",
+  "bed_moves_in_z": false,
+  "bed_size": [350, 350],
+  "z_limits": [-5, 310],
+  "moonraker": "http://127.0.0.1:7125",
+  "snapshot_url": "http://127.0.0.1:8080/?action=snapshot",
+  "device": "/dev/video0",
+  "resolution": "1280x960",
+  "bed_roi": [0.0, 1.0, 0.0, 1.0],
+  "parks": {
+    "fl": [5.0, 5.0],
+    "fr": [345.0, 5.0]
+  },
+  "default_park": "fl",
+  "sweep_heights": [20, 50, 100],
+  "probe_heights": [20, 50],
+  "exposure_ladder": [312, 625, 1250, 2500, 5000],
+  "exposure_target": 55,
+  "exposure_calibration_z": 50,
+  "min_clearance": 40,
+  "camera_lock": {
+    "auto_exposure": 1,
+    "white_balance_automatic": 0,
+    "white_balance_temperature": 4000
+  },
+  "camera_unlock": {
+    "auto_exposure": 3,
+    "white_balance_automatic": 1
+  },
+  "lights": {
+    "chamber": ["SET_LED LED=chamber WHITE={level:.2f} SYNC=0 TRANSMIT=1"],
+    "nozzle": [
+      "SET_LED LED=sb_leds RED={level:.2f} GREEN={level:.2f} BLUE={level:.2f} INDEX=2 SYNC=0 TRANSMIT=0",
+      "SET_LED LED=sb_leds RED={level:.2f} GREEN={level:.2f} BLUE={level:.2f} INDEX=3 SYNC=0 TRANSMIT=1"
+    ]
+  },
+  "lights_restore": {
+    "chamber": 1.0
+  },
+  "pre_gcode": ["STOP_LED_EFFECTS"],
+  "notes": "UNVERIFIED: snapshot_url, device, resolution and bed_roi are copied from the Trident and have not been checked against this machine. Bed is fixed and the gantry moves in Z, so plate geometry does not change with Z; only occlusion and lighting do. Confirm the camera before trusting a sweep."
+}
